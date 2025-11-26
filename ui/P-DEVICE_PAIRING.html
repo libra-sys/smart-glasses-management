@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>添加设备 - 镜控智联</title>
+    <script src="https://unpkg.byted-static.com/coze/space_ppt_lib/1.0.3-alpha.12/lib/tailwindcss.js"></script>
+    <script src="https://unpkg.byted-static.com/fortawesome/fontawesome-free/6.7.2/js/all.min.js" data-auto-replace-svg="nest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#007AFF',
+                        secondary: '#5856D6',
+                        success: '#34C759',
+                        danger: '#FF3B30',
+                        warning: '#FF9500',
+                        info: '#5AC8FA',
+                        background: '#F2F2F7',
+                        surface: '#FFFFFF',
+                        'text-primary': '#000000',
+                        'text-secondary': '#8E8E93',
+                        'text-tertiary': '#C7C7CC',
+                        'border-light': '#E5E5EA'
+                    },
+                    fontFamily: {
+                        'sf': ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Helvetica Neue', 'Arial', 'sans-serif']
+                    },
+                    boxShadow: {
+                        'card': '0 2px 10px rgba(0, 0, 0, 0.08)',
+                        'button': '0 2px 8px rgba(0, 122, 255, 0.2)'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .search-animation {
+            animation: searchPulse 2s infinite;
+        }
+        
+        @keyframes searchPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .pairing-animation {
+            animation: pairingSpin 1s linear infinite;
+        }
+        
+        @keyframes pairingSpin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .connection-method-active {
+            background-color: #007AFF;
+            color: white;
+        }
+        
+        .connection-method-inactive {
+            background-color: #F2F2F7;
+            color: #8E8E93;
+        }
+        
+        .device-item:hover {
+            background-color: #F8F9FA;
+        }
+        
+        .safe-bottom {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+    </style>
+</head>
+<body class="bg-background font-sf">
+    <!-- iOS 状态栏 -->
+    <div id="status-bar" class="fixed top-0 left-0 right-0 h-11 bg-surface flex items-center justify-between px-6 text-sm font-medium text-text-primary z-50">
+        <div class="flex items-center space-x-1">
+            <span>9:41</span>
+        </div>
+        <div class="flex items-center space-x-1">
+            <i class="fas fa-signal text-xs"></i>
+            <i class="fas fa-wifi text-xs"></i>
+            <div class="w-6 h-3 border border-text-primary rounded-sm">
+                <div class="w-4 h-1.5 bg-text-primary rounded-sm m-0.5"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主容器 -->
+    <div id="main-container" class="max-w-sm mx-auto bg-surface min-h-screen relative" style="margin-top: 44px;">
+        
+        <!-- 顶部导航栏 -->
+        <header id="top-header" class="bg-surface px-6 py-4 border-b border-border-light">
+            <div id="header-content" class="flex items-center justify-between">
+                <button id="back-btn" class="w-10 h-10 bg-background rounded-full flex items-center justify-center">
+                    <i class="fas fa-chevron-left text-primary text-lg"></i>
+                </button>
+                <h1 id="page-title" class="text-lg font-semibold text-text-primary">添加设备</h1>
+                <div class="w-10 h-10"></div> <!-- 占位元素保持居中 -->
+            </div>
+        </header>
+
+        <!-- 主内容区域 -->
+        <main id="main-content" class="px-6 py-6">
+            
+            <!-- 配对方式选择 -->
+            <section id="connection-method-section" class="mb-6">
+                <h2 id="connection-method-title" class="text-base font-medium text-text-primary mb-3">连接方式</h2>
+                <div id="connection-methods" class="flex space-x-3">
+                    <button id="bluetooth-method" class="flex-1 py-3 px-4 rounded-2xl text-sm font-medium transition-all duration-200 connection-method-active">
+                        <i class="fas fa-bluetooth text-lg mr-2"></i>
+                        蓝牙连接
+                    </button>
+                    <button id="wifi-method" class="flex-1 py-3 px-4 rounded-2xl text-sm font-medium transition-all duration-200 connection-method-inactive">
+                        <i class="fas fa-wifi text-lg mr-2"></i>
+                        WiFi连接
+                    </button>
+                </div>
+            </section>
+
+            <!-- 搜索状态 -->
+            <section id="search-status-section" class="mb-6">
+                <div id="search-status" class="bg-primary/10 rounded-2xl p-4 flex items-center space-x-3">
+                    <div id="search-icon" class="w-8 h-8 bg-primary rounded-full flex items-center justify-center search-animation">
+                        <i class="fas fa-search text-white text-sm"></i>
+                    </div>
+                    <div>
+                        <p id="search-text" class="text-primary font-medium">正在搜索附近设备...</p>
+                        <p id="search-subtext" class="text-primary/80 text-sm">请确保设备已开机并处于可配对状态</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 设备列表 -->
+            <section id="device-list-section">
+                <div id="device-list-header" class="flex items-center justify-between mb-4">
+                    <h3 id="device-list-title" class="text-base font-medium text-text-primary">附近设备</h3>
+                    <button id="refresh-btn" class="text-primary text-sm font-medium">
+                        <i class="fas fa-sync-alt mr-1"></i>刷新
+                    </button>
+                </div>
+                
+                <div id="device-list" class="space-y-3">
+                    <!-- 设备项将通过JavaScript动态生成 -->
+                </div>
+                
+                <!-- 无设备时的提示 -->
+                <div id="no-devices" class="text-center py-12 hidden">
+                    <div class="w-20 h-20 bg-text-tertiary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-mobile-alt text-text-tertiary text-2xl"></i>
+                    </div>
+                    <p class="text-text-secondary text-base font-medium mb-2">未发现设备</p>
+                    <p class="text-text-tertiary text-sm">请检查设备是否开机并处于可配对状态</p>
+                </div>
+            </section>
+
+        </main>
+
+    </div>
+
+    <!-- 配对成功提示模态框 -->
+    <div id="success-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+        <div class="bg-surface rounded-3xl p-6 mx-6 max-w-sm w-full">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-success/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-check text-success text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-text-primary mb-2">配对成功</h3>
+                <p class="text-text-secondary text-sm mb-6">设备已成功添加到您的账户</p>
+                <button id="success-confirm-btn" class="w-full bg-primary text-white py-3 px-4 rounded-2xl font-medium">
+                    确定
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 配对失败提示模态框 -->
+    <div id="error-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+        <div class="bg-surface rounded-3xl p-6 mx-6 max-w-sm w-full">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-danger/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-times text-danger text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-text-primary mb-2">配对失败</h3>
+                <p class="text-text-secondary text-sm mb-6">配对过程中出现问题，请重试</p>
+                <button id="error-retry-btn" class="w-full bg-primary text-white py-3 px-4 rounded-2xl font-medium">
+                    重试
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // 模拟设备数据
+            const mockDevices = [
+                {
+                    id: 'device-001',
+                    name: '智能眼镜 Pro',
+                    model: 'SG-Pro-2024',
+                    signal: 'strong'
+                },
+                {
+                    id: 'device-002',
+                    name: '智能眼镜 Lite',
+                    model: 'SG-Lite-2023',
+                    signal: 'medium'
+                },
+                {
+                    id: 'device-003',
+                    name: '智能眼镜 Mini',
+                    model: 'SG-Mini-2024',
+                    signal: 'weak'
+                }
+            ];
+
+            let currentConnectionMethod = 'bluetooth';
+            let isSearching = true;
+
+            // 返回按钮点击事件
+            document.querySelector('#back-btn').addEventListener('click', function() {
+                // 根据来源页面决定返回位置，这里默认返回设备列表页
+                window.location.href = 'P-DEVICE_LIST.html';
+            });
+
+            // 连接方式切换
+            document.querySelector('#bluetooth-method').addEventListener('click', function() {
+                if (currentConnectionMethod !== 'bluetooth') {
+                    currentConnectionMethod = 'bluetooth';
+                    updateConnectionMethodUI();
+                    startSearch();
+                }
+            });
+
+            document.querySelector('#wifi-method').addEventListener('click', function() {
+                if (currentConnectionMethod !== 'wifi') {
+                    currentConnectionMethod = 'wifi';
+                    updateConnectionMethodUI();
+                    startSearch();
+                }
+            });
+
+            // 刷新按钮点击事件
+            document.querySelector('#refresh-btn').addEventListener('click', function() {
+                startSearch();
+            });
+
+            // 成功模态框确定按钮
+            document.querySelector('#success-confirm-btn').addEventListener('click', function() {
+                document.querySelector('#success-modal').classList.add('hidden');
+                // 跳转到设备列表页
+                window.location.href = 'P-DEVICE_LIST.html';
+            });
+
+            // 失败模态框重试按钮
+            document.querySelector('#error-retry-btn').addEventListener('click', function() {
+                document.querySelector('#error-modal').classList.add('hidden');
+                startSearch();
+            });
+
+            // 更新连接方式UI
+            function updateConnectionMethodUI() {
+                const bluetoothBtn = document.querySelector('#bluetooth-method');
+                const wifiBtn = document.querySelector('#wifi-method');
+                
+                if (currentConnectionMethod === 'bluetooth') {
+                    bluetoothBtn.classList.remove('connection-method-inactive');
+                    bluetoothBtn.classList.add('connection-method-active');
+                    wifiBtn.classList.remove('connection-method-active');
+                    wifiBtn.classList.add('connection-method-inactive');
+                } else {
+                    wifiBtn.classList.remove('connection-method-inactive');
+                    wifiBtn.classList.add('connection-method-active');
+                    bluetoothBtn.classList.remove('connection-method-active');
+                    bluetoothBtn.classList.add('connection-method-inactive');
+                }
+            }
+
+            // 开始搜索设备
+            function startSearch() {
+                isSearching = true;
+                document.querySelector('#search-icon').classList.add('search-animation');
+                document.querySelector('#search-text').textContent = '正在搜索附近设备...';
+                document.querySelector('#device-list').innerHTML = '';
+                document.querySelector('#no-devices').classList.add('hidden');
+
+                // 模拟搜索延迟
+                setTimeout(() => {
+                    isSearching = false;
+                    document.querySelector('#search-icon').classList.remove('search-animation');
+                    document.querySelector('#search-text').textContent = '搜索完成';
+                    displayDevices();
+                }, 2000);
+            }
+
+            // 显示设备列表
+            function displayDevices() {
+                const deviceList = document.querySelector('#device-list');
+                const noDevices = document.querySelector('#no-devices');
+                
+                if (mockDevices.length === 0) {
+                    deviceList.innerHTML = '';
+                    noDevices.classList.remove('hidden');
+                    return;
+                }
+
+                noDevices.classList.add('hidden');
+                
+                deviceList.innerHTML = mockDevices.map(device => `
+                    <div id="device-item-${device.id}" class="device-item bg-surface rounded-2xl p-4 border border-border-light transition-all duration-200">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center">
+                                    <i class="fas fa-mobile-alt text-primary text-xl"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-text-primary">${device.name}</h4>
+                                    <p class="text-sm text-text-secondary">${device.model}</p>
+                                    <div class="flex items-center mt-1">
+                                        <i class="fas fa-signal text-xs text-success mr-1"></i>
+                                        <span class="text-xs text-text-secondary">${getSignalStrengthText(device.signal)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <button id="pair-btn-${device.id}" class="pair-btn bg-primary text-white px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 hover:bg-primary/90">
+                                配对
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+
+                // 为每个配对按钮添加事件监听
+                mockDevices.forEach(device => {
+                    document.querySelector(`#pair-btn-${device.id}`).addEventListener('click', function() {
+                        startPairing(device.id, this);
+                    });
+                });
+            }
+
+            // 获取信号强度文本
+            function getSignalStrengthText(strength) {
+                switch(strength) {
+                    case 'strong': return '信号强';
+                    case 'medium': return '信号中等';
+                    case 'weak': return '信号弱';
+                    default: return '未知';
+                }
+            }
+
+            // 开始配对
+            function startPairing(deviceId, buttonElement) {
+                // 禁用按钮并显示配对中状态
+                buttonElement.disabled = true;
+                buttonElement.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>配对中...';
+                
+                // 模拟配对过程
+                setTimeout(() => {
+                    // 模拟配对结果（80%成功率）
+                    const isSuccess = Math.random() > 0.2;
+                    
+                    if (isSuccess) {
+                        showSuccessModal();
+                    } else {
+                        showErrorModal();
+                        // 恢复按钮状态
+                        buttonElement.disabled = false;
+                        buttonElement.textContent = '配对';
+                    }
+                }, 3000);
+            }
+
+            // 显示成功模态框
+            function showSuccessModal() {
+                document.querySelector('#success-modal').classList.remove('hidden');
+            }
+
+            // 显示失败模态框
+            function showErrorModal() {
+                document.querySelector('#error-modal').classList.remove('hidden');
+            }
+
+            // 页面加载时开始搜索
+            startSearch();
+        });
+    </script>
+</body>
+</html>

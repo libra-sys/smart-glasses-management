@@ -1,0 +1,135 @@
+<!--model.wxml-->
+<view class="container">
+  <!-- 顶部导航栏 -->
+  <view class="header">
+    <text class="page-title">功能组件</text>
+  </view>
+
+  <!-- 标签页 -->
+  <view class="tabs">
+    <view 
+      class="tab {{activeTab === 'installed' ? 'active' : ''}}"
+      bindtap="switchTab"
+      data-tab="installed"
+    >
+      <text>已安装</text>
+    </view>
+    <view 
+      class="tab {{activeTab === 'recommended' ? 'active' : ''}}"
+      bindtap="switchTab"
+      data-tab="recommended"
+    >
+      <text>推荐</text>
+    </view>
+    <view 
+      class="tab {{activeTab === 'community' ? 'active' : ''}}"
+      bindtap="switchTab"
+      data-tab="community"
+    >
+      <text>社区</text>
+    </view>
+  </view>
+
+  <!-- 已安装组件 -->
+  <view class="section" wx:if="{{activeTab === 'installed'}}">
+    <view class="section-header">
+      <view class="section-icon">📦</view>
+      <text class="section-title">已安装</text>
+    </view>
+    
+    <view class="component-list">
+      <view wx:for="{{installedComponents}}" wx:key="id" class="component-item">
+        <view class="component-icon" style="background-color: {{item.color}};">
+          <text class="icon-emoji">{{item.icon}}</text>
+        </view>
+        <view class="component-info">
+          <text class="component-name">{{item.name}}</text>
+          <text class="component-desc">{{item.description}}</text>
+        </view>
+        <switch 
+          checked="{{item.enabled}}" 
+          bindchange="toggleInstalledComponent"
+          data-index="{{index}}"
+          class="component-switch"
+        />
+      </view>
+    </view>
+  </view>
+
+  <!-- 推荐组件 -->
+  <view class="section" wx:if="{{activeTab === 'recommended'}}">
+    <view class="section-header">
+      <view class="section-icon">⭐</view>
+      <text class="section-title">推荐组件</text>
+    </view>
+    
+    <view class="component-list">
+      <view wx:for="{{recommendedComponents}}" wx:key="id" class="component-item recommended">
+        <view class="component-icon" style="background-color: {{item.color}};">
+          <text class="icon-emoji">{{item.icon}}</text>
+        </view>
+        <view class="component-info">
+          <text class="component-name">{{item.name}}</text>
+          <text class="component-desc">{{item.description}}</text>
+        </view>
+        <button 
+          class="install-btn"
+          bindtap="installComponent"
+          data-component="{{item}}"
+          data-source="recommended"
+        >
+          安装
+        </button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 社区组件 -->
+  <view class="section" wx:if="{{activeTab === 'community'}}">
+    <view class="section-header">
+      <view class="section-icon">🌐</view>
+      <text class="section-title">社区组件</text>
+      <text class="section-subtitle">来自 http://localhost:5175</text>
+    </view>
+    
+    <view class="component-list">
+      <view 
+        wx:for="{{communityComponents}}" 
+        wx:key="id" 
+        class="component-item community"
+        bindtap="viewComponentDetail"
+        data-component="{{item}}"
+      >
+        <view class="component-icon" style="background-color: {{item.color}};">
+          <text class="icon-emoji">{{item.icon}}</text>
+        </view>
+        <view class="component-info">
+          <text class="component-name">{{item.name}}</text>
+          <text class="component-desc">{{item.description}}</text>
+          <view class="component-meta">
+            <text class="meta-item">👤 {{item.author}}</text>
+            <text class="meta-item">📥 {{item.downloads}}</text>
+            <text class="meta-item">v{{item.version}}</text>
+          </view>
+        </view>
+        <button 
+          wx:if="{{!item.installed}}"
+          class="install-btn"
+          bindtap="installComponent"
+          catchtap="stopPropagation"
+          data-component="{{item}}"
+          data-source="community"
+        >
+          安装
+        </button>
+        <view wx:else class="installed-badge">✔ 已安装</view>
+      </view>
+      
+      <view wx:if="{{communityComponents.length === 0}}" class="empty-state">
+        <text class="empty-icon">📦</text>
+        <text class="empty-text">暂无社区组件</text>
+        <text class="empty-hint">请确认网站服务器已启动</text>
+      </view>
+    </view>
+  </view>
+</view>

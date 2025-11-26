@@ -1,0 +1,103 @@
+<!-- 音量控制页面 -->
+<view class="container">
+  <view class="page-header">
+    <text class="page-title">音量控制</text>
+    <text class="page-subtitle">精细调节各项音量</text>
+  </view>
+
+  <!-- 主音量 -->
+  <view class="section">
+    <view class="volume-header">
+      <text class="volume-icon-large">🔊</text>
+      <text class="volume-value">{{masterVolume}}%</text>
+    </view>
+    <slider 
+      class="master-slider"
+      value="{{masterVolume}}" 
+      min="0" 
+      max="100" 
+      step="1"
+      activeColor="#007AFF"
+      backgroundColor="#E5E5EA"
+      block-size="24"
+      bindchange="masterVolumeChange"
+      show-value />
+    <text class="volume-label">主音量</text>
+  </view>
+
+  <!-- 分项音量控制 -->
+  <view class="section">
+    <text class="section-title">分项控制</text>
+    
+    <!-- 媒体音量 -->
+    <view class="control-item">
+      <view class="item-header">
+        <text class="item-icon">🎵</text>
+        <text class="item-name">媒体音量</text>
+        <text class="item-value">{{mediaVolume}}%</text>
+      </view>
+      <slider 
+        value="{{mediaVolume}}" 
+        min="0" 
+        max="100" 
+        step="1"
+        activeColor="#34C759"
+        backgroundColor="#E5E5EA"
+        block-size="20"
+        bindchange="mediaVolumeChange" />
+    </view>
+
+    <!-- 通话音量 -->
+    <view class="control-item">
+      <view class="item-header">
+        <text class="item-icon">📞</text>
+        <text class="item-name">通话音量</text>
+        <text class="item-value">{{callVolume}}%</text>
+      </view>
+      <slider 
+        value="{{callVolume}}" 
+        min="0" 
+        max="100" 
+        step="1"
+        activeColor="#FF9500"
+        backgroundColor="#E5E5EA"
+        block-size="20"
+        bindchange="callVolumeChange" />
+    </view>
+
+    <!-- 提示音量 -->
+    <view class="control-item">
+      <view class="item-header">
+        <text class="item-icon">🔔</text>
+        <text class="item-name">提示音量</text>
+        <text class="item-value">{{alertVolume}}%</text>
+      </view>
+      <slider 
+        value="{{alertVolume}}" 
+        min="0" 
+        max="100" 
+        step="1"
+        activeColor="#FF3B30"
+        backgroundColor="#E5E5EA"
+        block-size="20"
+        bindchange="alertVolumeChange" />
+    </view>
+  </view>
+
+  <!-- 快捷按钮 -->
+  <view class="quick-actions">
+    <button class="action-btn" bindtap="muteAll">
+      <text class="btn-icon">🔇</text>
+      <text class="btn-text">全部静音</text>
+    </button>
+    <button class="action-btn" bindtap="resetAll">
+      <text class="btn-icon">↺</text>
+      <text class="btn-text">恢复默认</text>
+    </button>
+  </view>
+
+  <!-- 保存按钮 -->
+  <view class="footer">
+    <button class="save-btn" bindtap="saveSettings">保存设置</button>
+  </view>
+</view>

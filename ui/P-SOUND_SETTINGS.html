@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音效设置 - 镜控智联</title>
+    <script src="https://unpkg.byted-static.com/coze/space_ppt_lib/1.0.3-alpha.12/lib/tailwindcss.js"></script>
+    <script src="https://unpkg.byted-static.com/fortawesome/fontawesome-free/6.7.2/js/all.min.js" data-auto-replace-svg="nest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#007AFF',
+                        secondary: '#5856D6',
+                        success: '#34C759',
+                        danger: '#FF3B30',
+                        warning: '#FF9500',
+                        info: '#5AC8FA',
+                        background: '#F2F2F7',
+                        surface: '#FFFFFF',
+                        'text-primary': '#000000',
+                        'text-secondary': '#8E8E93',
+                        'text-tertiary': '#C7C7CC',
+                        'border-light': '#E5E5EA'
+                    },
+                    fontFamily: {
+                        'sf': ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Helvetica Neue', 'Arial', 'sans-serif']
+                    },
+                    boxShadow: {
+                        'card': '0 2px 10px rgba(0, 0, 0, 0.08)',
+                        'button': '0 2px 8px rgba(0, 122, 255, 0.2)'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .tab-active {
+            background-color: #007AFF;
+            color: white;
+        }
+        
+        .tab-inactive {
+            background-color: #F2F2F7;
+            color: #8E8E93;
+        }
+        
+        .sound-item-active {
+            border-color: #007AFF;
+            background-color: rgba(0, 122, 255, 0.05);
+        }
+        
+        .preview-playing {
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .upload-progress {
+            background: linear-gradient(90deg, #007AFF 0%, #5856D6 100%);
+        }
+        
+        .safe-bottom {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+    </style>
+</head>
+<body class="bg-background font-sf">
+    <!-- iOS 状态栏 -->
+    <div id="status-bar" class="fixed top-0 left-0 right-0 h-11 bg-surface flex items-center justify-between px-6 text-sm font-medium text-text-primary z-50">
+        <div class="flex items-center space-x-1">
+            <span>9:41</span>
+        </div>
+        <div class="flex items-center space-x-1">
+            <i class="fas fa-signal text-xs"></i>
+            <i class="fas fa-wifi text-xs"></i>
+            <div class="w-6 h-3 border border-text-primary rounded-sm">
+                <div class="w-4 h-1.5 bg-text-primary rounded-sm m-0.5"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主容器 -->
+    <div id="main-container" class="max-w-sm mx-auto bg-surface min-h-screen relative" style="margin-top: 44px;">
+        
+        <!-- 顶部导航栏 -->
+        <header id="top-header" class="bg-surface px-6 py-4 border-b border-border-light">
+            <div id="header-content" class="flex items-center justify-between">
+                <button id="back-btn" class="w-10 h-10 flex items-center justify-center">
+                    <i class="fas fa-chevron-left text-primary text-lg"></i>
+                </button>
+                <h1 id="page-title" class="text-lg font-semibold text-text-primary">音效设置</h1>
+                <div class="w-10"></div> <!-- 占位元素保持标题居中 -->
+            </div>
+        </header>
+
+        <!-- 主内容区域 -->
+        <main id="main-content" class="px-6 py-6 pb-8">
+            
+            <!-- 音效类型切换 -->
+            <section id="sound-type-tabs" class="mb-6">
+                <div class="flex space-x-2 bg-background rounded-2xl p-1">
+                    <button id="tab-power-on" class="flex-1 py-3 px-4 rounded-xl text-sm font-medium transition-all duration-200 tab-active" role="tab">
+                        开机音效
+                    </button>
+                    <button id="tab-power-off" class="flex-1 py-3 px-4 rounded-xl text-sm font-medium transition-all duration-200 tab-inactive" role="tab">
+                        关机音效
+                    </button>
+                </div>
+            </section>
+
+            <!-- 当前音效显示 -->
+            <section id="current-sound" class="mb-6">
+                <div class="bg-surface rounded-2xl p-4 shadow-card border border-border-light">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-sm font-medium text-text-secondary">当前音效</h3>
+                        <div class="flex items-center space-x-2">
+                            <button id="current-preview-btn" class="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                                <i class="fas fa-play text-primary text-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 bg-secondary/10 rounded-2xl flex items-center justify-center">
+                            <i class="fas fa-music text-secondary text-xl"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p id="current-sound-name" class="font-medium text-text-primary">经典提示音</p>
+                            <p class="text-sm text-text-secondary">预设音效</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 预设音效列表 -->
+            <section id="preset-sounds" class="mb-6">
+                <h3 class="text-lg font-semibold text-text-primary mb-4">预设音效</h3>
+                <div id="preset-sounds-list" class="space-y-3">
+                    <!-- 预设音效项将通过JavaScript动态生成 -->
+                </div>
+            </section>
+
+            <!-- 自定义音效上传 -->
+            <section id="custom-sounds" class="mb-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold text-text-primary">自定义音效</h3>
+                    <button id="upload-custom-btn" class="px-4 py-2 bg-primary text-white rounded-xl text-sm font-medium hover:bg-primary/90 transition-all duration-200">
+                        <i class="fas fa-plus mr-2"></i>上传音效
+                    </button>
+                </div>
+                
+                <!-- 上传进度条 -->
+                <div id="upload-progress-container" class="hidden mb-4">
+                    <div class="bg-background rounded-full h-2">
+                        <div id="upload-progress-bar" class="upload-progress h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                    <p id="upload-status-text" class="text-sm text-text-secondary mt-2">正在上传...</p>
+                </div>
+                
+                <!-- 自定义音效列表 -->
+                <div id="custom-sounds-list" class="space-y-3">
+                    <!-- 自定义音效项将通过JavaScript动态生成 -->
+                </div>
+                
+                <!-- 空状态提示 -->
+                <div id="custom-sounds-empty" class="text-center py-8">
+                    <div class="w-16 h-16 bg-background rounded-full flex items-center justify-center mx-auto mb-3">
+                        <i class="fas fa-music text-text-tertiary text-2xl"></i>
+                    </div>
+                    <p class="text-text-secondary">暂无自定义音效</p>
+                    <p class="text-sm text-text-tertiary mt-1">点击上传按钮添加您的专属音效</p>
+                </div>
+            </section>
+
+        </main>
+
+    </div>
+
+    <script>
+        // 音效数据
+        const soundData = {
+            powerOn: {
+                current: 'classic',
+                presets: [
+                    { id: 'classic', name: '经典提示音', duration: '0.5s' },
+                    { id: 'gentle', name: '轻柔提示音', duration: '0.7s' },
+                    { id: 'modern', name: '现代科技音', duration: '0.6s' },
+                    { id: 'chime', name: '清脆铃声', duration: '0.4s' },
+                    { id: 'warm', name: '温暖提示音', duration: '0.8s' }
+                ],
+                custom: [
+                    { id: 'custom1', name: '我的专属音效', duration: '1.2s', fileName: 'my_sound.mp3' }
+                ]
+            },
+            powerOff: {
+                current: 'gentle',
+                presets: [
+                    { id: 'gentle', name: '轻柔关闭音', duration: '0.6s' },
+                    { id: 'smooth', name: '平滑关闭音', duration: '0.8s' },
+                    { id: 'soft', name: '柔和提示音', duration: '0.5s' },
+                    { id: 'quiet', name: '安静关闭音', duration: '0.4s' }
+                ],
+                custom: []
+            }
+        };
+
+        let currentSoundType = 'powerOn'; // 当前选中的音效类型
+
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // 返回按钮点击事件
+            document.querySelector('#back-btn').addEventListener('click', function() {
+                window.location.href = 'P-DEVICE_DETAIL.html';
+            });
+
+            // 音效类型切换
+            document.querySelector('#tab-power-on').addEventListener('click', function() {
+                switchSoundType('powerOn');
+            });
+
+            document.querySelector('#tab-power-off').addEventListener('click', function() {
+                switchSoundType('powerOff');
+            });
+
+            // 上传自定义音效按钮
+            document.querySelector('#upload-custom-btn').addEventListener('click', function() {
+                console.log('需要调用第三方接口实现文件选择器');
+                // 注释：此功能需要调用设备文件选择API，在原型阶段仅做UI展示
+                simulateFileUpload();
+            });
+
+            // 初始化页面
+            initializePage();
+        });
+
+        function initializePage() {
+            updateCurrentSound();
+            renderPresetSounds();
+            renderCustomSounds();
+        }
+
+        function switchSoundType(type) {
+            currentSoundType = type;
+            
+            // 更新标签样式
+            const powerOnTab = document.querySelector('#tab-power-on');
+            const powerOffTab = document.querySelector('#tab-power-off');
+            
+            if (type === 'powerOn') {
+                powerOnTab.classList.remove('tab-inactive');
+                powerOnTab.classList.add('tab-active');
+                powerOffTab.classList.remove('tab-active');
+                powerOffTab.classList.add('tab-inactive');
+            } else {
+                powerOffTab.classList.remove('tab-inactive');
+                powerOffTab.classList.add('tab-active');
+                powerOnTab.classList.remove('tab-active');
+                powerOnTab.classList.add('tab-inactive');
+            }
+            
+            // 更新页面内容
+            updateCurrentSound();
+            renderPresetSounds();
+            renderCustomSounds();
+        }
+
+        function updateCurrentSound() {
+            const currentSoundId = soundData[currentSoundType].current;
+            const sound = findSoundById(currentSoundId);
+            
+            if (sound) {
+                document.querySelector('#current-sound-name').textContent = sound.name;
+                document.querySelector('#current-preview-btn').onclick = function() {
+                    previewSound(sound.id, this);
+                };
+            }
+        }
+
+        function renderPresetSounds() {
+            const container = document.querySelector('#preset-sounds-list');
+            const presets = soundData[currentSoundType].presets;
+            
+            container.innerHTML = '';
+            
+            presets.forEach(sound => {
+                const isActive = sound.id === soundData[currentSoundType].current;
+                const soundElement = createSoundElement(sound, false, isActive);
+                container.appendChild(soundElement);
+            });
+        }
+
+        function renderCustomSounds() {
+            const container = document.querySelector('#custom-sounds-list');
+            const customSounds = soundData[currentSoundType].custom;
+            const emptyState = document.querySelector('#custom-sounds-empty');
+            
+            if (customSounds.length === 0) {
+                container.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            container.style.display = 'block';
+            emptyState.style.display = 'none';
+            container.innerHTML = '';
+            
+            customSounds.forEach(sound => {
+                const isActive = sound.id === soundData[currentSoundType].current;
+                const soundElement = createSoundElement(sound, true, isActive);
+                container.appendChild(soundElement);
+            });
+        }
+
+        function createSoundElement(sound, isCustom, isActive) {
+            const div = document.createElement('div');
+            div.className = `bg-surface rounded-2xl p-4 shadow-card border border-border-light transition-all duration-200 ${isActive ? 'sound-item-active' : ''}`;
+            
+            const iconClass = isCustom ? 'fas fa-upload' : 'fas fa-music';
+            const iconBgClass = isCustom ? 'bg-info/10 text-info' : 'bg-secondary/10 text-secondary';
+            const sourceText = isCustom ? '自定义' : '预设音效';
+            
+            div.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3 flex-1">
+                        <div class="w-12 h-12 ${iconBgClass} rounded-2xl flex items-center justify-center">
+                            <i class="${iconClass} text-xl"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-medium text-text-primary">${sound.name}</p>
+                            <p class="text-sm text-text-secondary">${sourceText} · ${sound.duration}</p>
+                            ${isCustom ? `<p class="text-xs text-text-tertiary">${sound.fileName}</p>` : ''}
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button class="preview-btn w-10 h-10 bg-background rounded-xl flex items-center justify-center hover:bg-primary/10 transition-all duration-200" data-sound-id="${sound.id}">
+                            <i class="fas fa-play text-text-secondary text-sm"></i>
+                        </button>
+                        <button class="apply-btn px-4 py-2 bg-primary text-white rounded-xl text-sm font-medium hover:bg-primary/90 transition-all duration-200 ${isActive ? 'bg-success' : ''}" data-sound-id="${sound.id}" data-is-active="${isActive}">
+                            ${isActive ? '已应用' : '应用'}
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            // 添加预览按钮事件
+            const previewBtn = div.querySelector('.preview-btn');
+            previewBtn.addEventListener('click', function() {
+                previewSound(sound.id, this);
+            });
+            
+            // 添加应用按钮事件
+            const applyBtn = div.querySelector('.apply-btn');
+            applyBtn.addEventListener('click', function() {
+                if (!isActive) {
+                    applySound(sound.id, div, applyBtn);
+                }
+            });
+            
+            return div;
+        }
+
+        function previewSound(soundId, button) {
+            const sound = findSoundById(soundId);
+            if (!sound) return;
+            
+            const icon = button.querySelector('i');
+            icon.className = 'fas fa-pause text-primary text-sm';
+            button.classList.add('preview-playing');
+            
+            console.log(`播放音效: ${sound.name}`);
+            
+            // 模拟播放时长
+            setTimeout(() => {
+                icon.className = 'fas fa-play text-text-secondary text-sm';
+                button.classList.remove('preview-playing');
+            }, 1000);
+        }
+
+        function applySound(soundId, soundElement, applyBtn) {
+            // 移除当前活跃音效的样式
+            document.querySelectorAll('.sound-item-active').forEach(item => {
+                item.classList.remove('sound-item-active');
+                const btn = item.querySelector('.apply-btn');
+                btn.textContent = '应用';
+                btn.className = 'apply-btn px-4 py-2 bg-primary text-white rounded-xl text-sm font-medium hover:bg-primary/90 transition-all duration-200';
+                btn.setAttribute('data-is-active', 'false');
+            });
+            
+            // 设置新的活跃音效
+            soundElement.classList.add('sound-item-active');
+            applyBtn.textContent = '已应用';
+            applyBtn.className = 'apply-btn px-4 py-2 bg-success text-white rounded-xl text-sm font-medium transition-all duration-200';
+            applyBtn.setAttribute('data-is-active', 'true');
+            
+            // 更新数据
+            soundData[currentSoundType].current = soundId;
+            
+            // 更新当前音效显示
+            updateCurrentSound();
+            
+            // 显示应用成功提示
+            showToast('音效已应用');
+        }
+
+        function findSoundById(soundId) {
+            const currentSounds = soundData[currentSoundType];
+            // 先在预设音效中查找
+            const presetSound = currentSounds.presets.find(sound => sound.id === soundId);
+            if (presetSound) return presetSound;
+            
+            // 再在自定义音效中查找
+            const customSound = currentSounds.custom.find(sound => sound.id === soundId);
+            if (customSound) return customSound;
+            
+            return null;
+        }
+
+        function simulateFileUpload() {
+            const progressContainer = document.querySelector('#upload-progress-container');
+            const progressBar = document.querySelector('#upload-progress-bar');
+            const statusText = document.querySelector('#upload-status-text');
+            
+            progressContainer.classList.remove('hidden');
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    
+                    setTimeout(() => {
+                        progressContainer.classList.add('hidden');
+                        addCustomSound();
+                        showToast('音效上传成功');
+                    }, 500);
+                }
+                
+                progressBar.style.width = progress + '%';
+                statusText.textContent = `正在上传... ${Math.round(progress)}%`;
+            }, 200);
+        }
+
+        function addCustomSound() {
+            const newSound = {
+                id: 'custom' + Date.now(),
+                name: '新上传音效',
+                duration: '1.0s',
+                fileName: 'uploaded_sound_' + Date.now() + '.mp3'
+            };
+            
+            soundData[currentSoundType].custom.push(newSound);
+            renderCustomSounds();
+        }
+
+        function showToast(message) {
+            // 创建提示元素
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-20 left-1/2 transform -translate-x-1/2 bg-text-primary text-white px-4 py-2 rounded-lg text-sm z-50';
+            toast.textContent = message;
+            
+            document.body.appendChild(toast);
+            
+            // 3秒后移除
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

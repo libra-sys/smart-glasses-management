@@ -1,0 +1,48 @@
+<!-- 功能组件页面 -->
+<view class="container">
+  <view class="page-header">
+    <text class="page-title">功能组件</text>
+    <text class="page-subtitle">扩展智能眼镜功能</text>
+  </view>
+
+  <!-- 已安装组件 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">已安装</text>
+      <text class="section-count">{{installedPlugins.length}}个</text>
+    </view>
+    
+    <view class="plugin-list">
+      <view class="plugin-item" wx:for="{{installedPlugins}}" wx:key="id">
+        <view class="plugin-icon-wrapper {{item.color}}">
+          <text class="plugin-icon">{{item.icon}}</text>
+        </view>
+        <view class="plugin-info">
+          <text class="plugin-name">{{item.name}}</text>
+          <text class="plugin-desc">{{item.description}}</text>
+        </view>
+        <switch checked="{{item.enabled}}" bindchange="togglePlugin" data-id="{{item.id}}" color="#007AFF"/>
+      </view>
+    </view>
+  </view>
+
+  <!-- 推荐组件 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">推荐组件</text>
+    </view>
+    
+    <view class="plugin-list">
+      <view class="plugin-item" wx:for="{{recommendPlugins}}" wx:key="id">
+        <view class="plugin-icon-wrapper {{item.color}}">
+          <text class="plugin-icon">{{item.icon}}</text>
+        </view>
+        <view class="plugin-info">
+          <text class="plugin-name">{{item.name}}</text>
+          <text class="plugin-desc">{{item.description}}</text>
+        </view>
+        <button class="install-btn" bindtap="installPlugin" data-id="{{item.id}}">安装</button>
+      </view>
+    </view>
+  </view>
+</view>

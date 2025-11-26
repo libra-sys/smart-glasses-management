@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>镜控智联 - 首页</title>
+    <script src="https://unpkg.byted-static.com/coze/space_ppt_lib/1.0.3-alpha.12/lib/tailwindcss.js"></script>
+    <script src="https://unpkg.byted-static.com/fortawesome/fontawesome-free/6.7.2/js/all.min.js" data-auto-replace-svg="nest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#007AFF',
+                        secondary: '#5856D6',
+                        success: '#34C759',
+                        danger: '#FF3B30',
+                        warning: '#FF9500',
+                        info: '#5AC8FA',
+                        background: '#F2F2F7',
+                        surface: '#FFFFFF',
+                        'text-primary': '#000000',
+                        'text-secondary': '#8E8E93',
+                        'text-tertiary': '#C7C7CC',
+                        'border-light': '#E5E5EA'
+                    },
+                    fontFamily: {
+                        'sf': ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Helvetica Neue', 'Arial', 'sans-serif']
+                    },
+                    boxShadow: {
+                        'card': '0 2px 10px rgba(0, 0, 0, 0.08)',
+                        'button': '0 2px 8px rgba(0, 122, 255, 0.2)'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .device-card-gradient {
+            background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
+        }
+        
+        .status-indicator {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .battery-level {
+            background: linear-gradient(90deg, #34C759 0%, #30D158 100%);
+        }
+        
+        .nav-active {
+            color: #007AFF;
+        }
+        
+        .safe-bottom {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .device-not-connected {
+            background: linear-gradient(135deg, #8E8E93 0%, #C7C7CC 100%);
+        }
+    </style>
+</head>
+<body class="bg-background font-sf">
+    <!-- iOS 状态栏 -->
+    <div id="status-bar" class="fixed top-0 left-0 right-0 h-11 bg-surface flex items-center justify-between px-6 text-sm font-medium text-text-primary z-50">
+        <div class="flex items-center space-x-1">
+            <span>9:41</span>
+        </div>
+        <div class="flex items-center space-x-1">
+            <i class="fas fa-signal text-xs"></i>
+            <i class="fas fa-wifi text-xs"></i>
+            <div class="w-6 h-3 border border-text-primary rounded-sm">
+                <div class="w-4 h-1.5 bg-text-primary rounded-sm m-0.5"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主容器 -->
+    <div id="main-container" class="max-w-sm mx-auto bg-surface min-h-screen relative" style="margin-top: 44px;">
+        
+        <!-- 顶部导航栏 -->
+        <header id="top-header" class="bg-surface px-6 py-4 border-b border-border-light">
+            <div id="header-content" class="flex items-center justify-between">
+                <div id="user-info" class="flex items-center space-x-3 cursor-pointer">
+                    <img id="user-avatar" src="https://s.coze.cn/image/oy1KR96zjQI/" 
+                         alt="用户头像" data-category="人物" 
+                         class="w-10 h-10 rounded-full object-cover">
+                    <div>
+                        <h1 id="greeting" class="text-lg font-semibold text-text-primary">早上好</h1>
+                        <p id="username" class="text-sm text-text-secondary">张先生</p>
+                    </div>
+                </div>
+                <button id="add-device-btn" class="w-10 h-10 bg-background rounded-full flex items-center justify-center">
+                    <i class="fas fa-plus text-primary text-lg"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- 主内容区域 -->
+        <main id="main-content" class="px-6 py-6 pb-24">
+            
+            <!-- 设备状态卡片 -->
+            <section id="device-card" class="device-card-gradient rounded-3xl p-6 mb-6 text-white shadow-card cursor-pointer">
+                <div id="device-header" class="flex items-center justify-between mb-4">
+                    <div>
+                        <h2 id="device-name" class="text-xl font-bold">智能眼镜 Pro</h2>
+                        <p id="device-model" class="text-white/80 text-sm">型号: SG-Pro-2024</p>
+                    </div>
+                    <div id="connection-status" class="flex items-center space-x-2">
+                        <div id="status-indicator" class="w-2 h-2 bg-success rounded-full status-indicator"></div>
+                        <span id="status-text" class="text-sm font-medium">已连接</span>
+                    </div>
+                </div>
+                
+                <!-- 设备状态信息 -->
+                <div id="device-status" class="grid grid-cols-2 gap-4 mb-6">
+                    <div id="battery-info" class="bg-white/10 rounded-2xl p-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <i class="fas fa-battery-three-quarters text-lg"></i>
+                            <span id="battery-percentage" class="text-lg font-bold">85%</span>
+                        </div>
+                        <div class="w-full bg-white/20 rounded-full h-2">
+                            <div id="battery-bar" class="battery-level h-2 rounded-full" style="width: 85%"></div>
+                        </div>
+                        <p id="battery-status" class="text-white/80 text-xs mt-1">电量充足</p>
+                    </div>
+                    
+                    <div id="mode-info" class="bg-white/10 rounded-2xl p-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <i class="fas fa-magic text-lg"></i>
+                            <span id="current-mode" class="text-lg font-bold">AI模式</span>
+                        </div>
+                        <p id="current-ai-model" class="text-white/80 text-xs">当前模型: GPT-4</p>
+                        <p id="mode-status" class="text-white/80 text-xs">运行正常</p>
+                    </div>
+                </div>
+                
+                <!-- 远程控制按钮 -->
+                <div id="control-buttons" class="flex space-x-3">
+                    <button id="power-on-btn" class="flex-1 bg-white/20 hover:bg-white/30 rounded-2xl py-3 px-4 transition-all duration-200">
+                        <i class="fas fa-power-off text-lg mr-2"></i>
+                        <span class="font-medium">开机</span>
+                    </button>
+                    <button id="power-off-btn" class="flex-1 bg-white/20 hover:bg-white/30 rounded-2xl py-3 px-4 transition-all duration-200">
+                        <i class="fas fa-power-off text-lg mr-2"></i>
+                        <span class="font-medium">关机</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- 无设备连接状态 -->
+            <section id="no-device-section" class="hidden device-not-connected rounded-3xl p-6 mb-6 text-white shadow-card">
+                <div class="text-center">
+                    <i class="fas fa-search text-4xl mb-4 opacity-80"></i>
+                    <h2 class="text-xl font-bold mb-2">暂无设备连接</h2>
+                    <p class="text-white/80 text-sm mb-6">请添加您的智能眼镜设备</p>
+                    <button id="add-device-from-no-device" class="bg-white/20 hover:bg-white/30 rounded-2xl py-3 px-6 transition-all duration-200">
+                        <i class="fas fa-plus text-lg mr-2"></i>
+                        <span class="font-medium">添加设备</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- 快速功能入口 -->
+            <section id="quick-actions" class="space-y-4">
+                <h3 id="quick-actions-title" class="text-lg font-semibold text-text-primary mb-4">快速设置</h3>
+                
+                <div id="action-grid" class="grid grid-cols-2 gap-4">
+                    <button id="ai-model-action" class="bg-surface rounded-2xl p-4 shadow-card border border-border-light hover:shadow-lg transition-all duration-200">
+                        <div class="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center mb-3">
+                            <i class="fas fa-brain text-primary text-xl"></i>
+                        </div>
+                        <h4 class="font-semibold text-text-primary mb-1">AI模型</h4>
+                        <p class="text-sm text-text-secondary">管理智能模型</p>
+                    </button>
+                    
+                    <button id="sound-action" class="bg-surface rounded-2xl p-4 shadow-card border border-border-light hover:shadow-lg transition-all duration-200">
+                        <div class="w-12 h-12 bg-secondary/10 rounded-2xl flex items-center justify-center mb-3">
+                            <i class="fas fa-music text-secondary text-xl"></i>
+                        </div>
+                        <h4 class="font-semibold text-text-primary mb-1">音效设置</h4>
+                        <p class="text-sm text-text-secondary">自定义音效</p>
+                    </button>
+                    
+                    <button id="components-action" class="bg-surface rounded-2xl p-4 shadow-card border border-border-light hover:shadow-lg transition-all duration-200">
+                        <div class="w-12 h-12 bg-warning/10 rounded-2xl flex items-center justify-center mb-3">
+                            <i class="fas fa-puzzle-piece text-warning text-xl"></i>
+                        </div>
+                        <h4 class="font-semibold text-text-primary mb-1">功能组件</h4>
+                        <p class="text-sm text-text-secondary">扩展功能</p>
+                    </button>
+                    
+                    <button id="volume-action" class="bg-surface rounded-2xl p-4 shadow-card border border-border-light hover:shadow-lg transition-all duration-200">
+                        <div class="w-12 h-12 bg-info/10 rounded-2xl flex items-center justify-center mb-3">
+                            <i class="fas fa-volume-up text-info text-xl"></i>
+                        </div>
+                        <h4 class="font-semibold text-text-primary mb-1">音量控制</h4>
+                        <p class="text-sm text-text-secondary">调节音量</p>
+                    </button>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- 底部导航栏 -->
+        <nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 bg-surface border-t border-border-light flex justify-around items-center h-20 px-2 safe-bottom z-40">
+            <a id="nav-home" href="#" class="flex flex-col items-center p-2 nav-active">
+                <i class="fas fa-home text-xl mb-1"></i>
+                <span class="text-xs">首页</span>
+            </a>
+            <a id="nav-devices" href="#" class="flex flex-col items-center p-2 text-text-secondary">
+                <i class="fas fa-mobile-alt text-xl mb-1"></i>
+                <span class="text-xs">设备</span>
+            </a>
+            <a id="nav-profile" href="#" class="flex flex-col items-center p-2 text-text-secondary">
+                <i class="fas fa-user text-xl mb-1"></i>
+                <span class="text-xs">我的</span>
+            </a>
+        </nav>
+
+    </div>
+
+    <script>
+        // 页面交互逻辑
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // 模拟设备数据
+            let currentDevice = {
+                id: 'device_001',
+                name: '智能眼镜 Pro',
+                model: 'SG-Pro-2024',
+                battery: 85,
+                connected: true,
+                currentMode: 'AI模式',
+                currentAIModel: 'GPT-4',
+                modeStatus: '运行正常'
+            };
+
+            let hasDevices = true; // 模拟是否有设备
+
+            // 更新设备状态显示
+            function updateDeviceStatus() {
+                if (hasDevices && currentDevice.connected) {
+                    document.querySelector('#device-card').classList.remove('hidden');
+                    document.querySelector('#no-device-section').classList.add('hidden');
+                    
+                    // 更新设备信息
+                    document.querySelector('#device-name').textContent = currentDevice.name;
+                    document.querySelector('#device-model').textContent = `型号: ${currentDevice.model}`;
+                    document.querySelector('#battery-percentage').textContent = `${currentDevice.battery}%`;
+                    document.querySelector('#battery-bar').style.width = `${currentDevice.battery}%`;
+                    document.querySelector('#current-mode').textContent = currentDevice.currentMode;
+                    document.querySelector('#current-ai-model').textContent = `当前模型: ${currentDevice.currentAIModel}`;
+                    document.querySelector('#mode-status').textContent = currentDevice.modeStatus;
+                    
+                    // 更新连接状态
+                    const statusIndicator = document.querySelector('#status-indicator');
+                    const statusText = document.querySelector('#status-text');
+                    statusIndicator.className = 'w-2 h-2 bg-success rounded-full status-indicator';
+                    statusText.textContent = '已连接';
+                    
+                    // 更新电池状态文本
+                    const batteryStatus = document.querySelector('#battery-status');
+                    if (currentDevice.battery > 70) {
+                        batteryStatus.textContent = '电量充足';
+                    } else if (currentDevice.battery > 30) {
+                        batteryStatus.textContent = '电量中等';
+                    } else {
+                        batteryStatus.textContent = '电量不足';
+                    }
+                } else {
+                    document.querySelector('#device-card').classList.add('hidden');
+                    document.querySelector('#no-device-section').classList.remove('hidden');
+                }
+            }
+
+            // 用户头像点击事件
+            document.querySelector('#user-info').addEventListener('click', function() {
+                window.location.href = 'P-ACCOUNT_SETTINGS.html';
+            });
+
+            // 添加设备按钮点击事件
+            document.querySelector('#add-device-btn').addEventListener('click', function() {
+                window.location.href = 'P-DEVICE_PAIRING.html';
+            });
+
+            // 无设备状态下的添加设备按钮
+            document.querySelector('#add-device-from-no-device').addEventListener('click', function() {
+                window.location.href = 'P-DEVICE_PAIRING.html';
+            });
+
+            // 设备卡片点击事件
+            document.querySelector('#device-card').addEventListener('click', function() {
+                window.location.href = `P-DEVICE_DETAIL.html?deviceId=${currentDevice.id}`;
+            });
+
+            // 快速功能入口点击事件
+            document.querySelector('#ai-model-action').addEventListener('click', function() {
+                window.location.href = `P-AI_MODEL_MANAGE.html?deviceId=${currentDevice.id}`;
+            });
+
+            document.querySelector('#sound-action').addEventListener('click', function() {
+                window.location.href = `P-SOUND_SETTINGS.html?deviceId=${currentDevice.id}`;
+            });
+
+            document.querySelector('#components-action').addEventListener('click', function() {
+                window.location.href = `P-COMPONENT_MANAGE.html?deviceId=${currentDevice.id}`;
+            });
+
+            document.querySelector('#volume-action').addEventListener('click', function() {
+                window.location.href = `P-DEVICE_DETAIL.html?deviceId=${currentDevice.id}#volume-control`;
+            });
+
+            // 远程控制按钮点击事件
+            document.querySelector('#power-on-btn').addEventListener('click', function() {
+                if (!currentDevice.connected) return;
+                
+                // 模拟开机操作
+                this.innerHTML = '<i class="fas fa-spinner fa-spin text-lg mr-2"></i><span class="font-medium">开机中...</span>';
+                this.disabled = true;
+                
+                setTimeout(() => {
+                    this.innerHTML = '<i class="fas fa-power-off text-lg mr-2"></i><span class="font-medium">开机</span>';
+                    this.disabled = false;
+                    alert('设备已开机');
+                    currentDevice.connected = true;
+                    updateDeviceStatus();
+                }, 2000);
+            });
+
+            document.querySelector('#power-off-btn').addEventListener('click', function() {
+                if (!currentDevice.connected) return;
+                
+                // 模拟关机操作
+                this.innerHTML = '<i class="fas fa-spinner fa-spin text-lg mr-2"></i><span class="font-medium">关机中...</span>';
+                this.disabled = true;
+                
+                setTimeout(() => {
+                    this.innerHTML = '<i class="fas fa-power-off text-lg mr-2"></i><span class="font-medium">关机</span>';
+                    this.disabled = false;
+                    alert('设备已关机');
+                    currentDevice.connected = false;
+                    updateDeviceStatus();
+                }, 2000);
+            });
+
+            // 底部导航栏点击事件
+            document.querySelector('#nav-home').addEventListener('click', function(e) {
+                e.preventDefault();
+                // 已在首页，无需操作
+            });
+
+            document.querySelector('#nav-devices').addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = 'P-DEVICE_LIST.html';
+            });
+
+            document.querySelector('#nav-profile').addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = 'P-ACCOUNT_SETTINGS.html';
+            });
+
+            // 动态更新时间和问候语
+            function updateGreeting() {
+                const now = new Date();
+                const hour = now.getHours();
+                const greetingElement = document.querySelector('#greeting');
+                
+                if (hour < 12) {
+                    greetingElement.textContent = '早上好';
+                } else if (hour < 18) {
+                    greetingElement.textContent = '下午好';
+                } else {
+                    greetingElement.textContent = '晚上好';
+                }
+            }
+
+            // 模拟设备状态实时更新
+            function simulateDeviceUpdates() {
+                setInterval(function() {
+                    // 随机更新电池电量（模拟）
+                    if (currentDevice.connected && Math.random() > 0.8) {
+                        currentDevice.battery = Math.max(0, currentDevice.battery - Math.floor(Math.random() * 3));
+                        updateDeviceStatus();
+                    }
+                    
+                    // 随机模拟连接状态变化（低概率）
+                    if (Math.random() > 0.98) {
+                        currentDevice.connected = !currentDevice.connected;
+                        updateDeviceStatus();
+                    }
+                }, 5000);
+            }
+
+            // 初始化页面
+            updateGreeting();
+            updateDeviceStatus();
+            simulateDeviceUpdates();
+        });
+    </script>
+</body>
+</html>

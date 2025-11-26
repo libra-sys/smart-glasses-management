@@ -1,0 +1,84 @@
+<!-- login.wxml -->
+<!-- 登录/注册页面 -->
+<view class="container">
+  <!-- 顶部装饰 -->
+  <view class="top-decoration">
+    <view class="circle circle-1"></view>
+    <view class="circle circle-2"></view>
+  </view>
+
+  <!-- Logo区域 -->
+  <view class="logo-section">
+    <view class="logo-wrapper">
+      <text class="logo-icon">👓</text>
+    </view>
+    <text class="app-name">镜控智联</text>
+    <text class="app-slogan">智能眼镜管理助手</text>
+  </view>
+
+  <!-- 登录表单 -->
+  <view class="form-section">
+    <!-- Tab切换 -->
+    <view class="tab-bar">
+      <view class="tab-item {{isLogin ? 'active' : ''}}" bindtap="switchToLogin">
+        <text class="tab-text">登录</text>
+      </view>
+      <view class="tab-item {{!isLogin ? 'active' : ''}}" bindtap="switchToRegister">
+        <text class="tab-text">注册</text>
+      </view>
+      <view class="tab-indicator" style="left: {{isLogin ? '0' : '50%'}}"></view>
+    </view>
+
+    <!-- 登录表单 -->
+    <view wx:if="{{isLogin}}" class="form-container">
+      <view class="input-group">
+        <view class="input-icon">📱</view>
+        <input class="input-field" type="text" placeholder="请输入手机号" value="{{phone}}" bindinput="onPhoneInput" />
+      </view>
+      <view class="input-group">
+        <view class="input-icon">🔒</view>
+        <input class="input-field" type="password" placeholder="请输入密码" value="{{password}}" bindinput="onPasswordInput" />
+      </view>
+      <view class="forget-password" bindtap="forgetPassword">
+        <text>忘记密码？</text>
+      </view>
+      <button class="submit-btn" bindtap="handleLogin">登录</button>
+    </view>
+
+    <!-- 注册表单 -->
+    <view wx:else class="form-container">
+      <view class="input-group">
+        <view class="input-icon">👤</view>
+        <input class="input-field" type="text" placeholder="请输入用户名" value="{{username}}" bindinput="onUsernameInput" />
+      </view>
+      <view class="input-group">
+        <view class="input-icon">📱</view>
+        <input class="input-field" type="text" placeholder="请输入手机号" value="{{phone}}" bindinput="onPhoneInput" />
+      </view>
+      <view class="input-group">
+        <view class="input-icon">🔒</view>
+        <input class="input-field" type="password" placeholder="请设置密码（6-16位）" value="{{password}}" bindinput="onPasswordInput" />
+      </view>
+      <view class="input-group">
+        <view class="input-icon">🔒</view>
+        <input class="input-field" type="password" placeholder="请确认密码" value="{{confirmPassword}}" bindinput="onConfirmPasswordInput" />
+      </view>
+      <button class="submit-btn" bindtap="handleRegister">注册</button>
+    </view>
+
+    <!-- 其他登录方式 -->
+    <view class="other-login">
+      <view class="divider">
+        <view class="line"></view>
+        <text class="divider-text">其他登录方式</text>
+        <view class="line"></view>
+      </view>
+      <view class="other-login-methods">
+        <button class="wechat-login-btn" bindtap="handleWechatLogin">
+          <text class="wechat-icon">💚</text>
+          <text class="wechat-text">微信一键登录</text>
+        </button>
+      </view>
+    </view>
+  </view>
+</view>

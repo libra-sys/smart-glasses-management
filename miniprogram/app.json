@@ -1,0 +1,44 @@
+{
+  "pages": [
+    "pages/login/login",
+    "pages/index/index",
+    "pages/device/device",
+    "pages/model/model",
+    "pages/aimodel/aimodel",
+    "pages/example/index",
+    "pages/settings/settings",
+    "pages/sound/sound",
+    "pages/extension/extension",
+    "pages/volume/volume"
+  ],
+  "window": {
+    "backgroundColor": "#F2F2F7",
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#FFFFFF",
+    "navigationBarTitleText": "镜控智联",
+    "navigationBarTextStyle": "black"
+  },
+  "sitemapLocation": "sitemap.json",
+  "style": "v2",
+  "lazyCodeLoading": "requiredComponents",
+  "tabBar": {
+    "color": "#8E8E93",
+    "selectedColor": "#007AFF",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/device/device",
+        "text": "设备"
+      },
+      {
+        "pagePath": "pages/model/model",
+        "text": "组件"
+      }
+    ]
+  }
+}

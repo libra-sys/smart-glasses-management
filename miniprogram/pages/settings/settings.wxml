@@ -1,0 +1,69 @@
+<!-- settings.wxml -->
+<!-- 设置页面 - 管理智能眼镜的各种设置选项 -->
+<!-- 页面主容器 -->
+<view class="container bg-background font-sf">
+  <!-- 顶部导航栏 -->
+  <view class="top-header bg-surface px-6 py-4 border-b border-border-light">
+    <view class="header-content flex items-center justify-between">
+      <!-- 返回按钮 -->
+      <button class="back-btn w-10 h-10 bg-background rounded-full flex items-center justify-center" bindtap="goBack">←</button>
+      <!-- 页面标题 -->
+      <text class="page-title text-xl font-bold text-text-primary">设置</text>
+      <!-- 占位元素，用于平衡布局 -->
+      <view class="placeholder w-10"></view>
+    </view>
+  </view>
+
+  <!-- 主内容区域 -->
+  <view class="main-content">
+    <!-- 用户信息 -->
+    <view class="user-card">
+      <view class="user-avatar-wrapper">
+        <text class="user-avatar-text">{{userInfo.username ? userInfo.username.substring(0,1) : '游'}}</text>
+      </view>
+      <view class="user-info">
+        <text class="user-name">{{userInfo.username || '游客'}}</text>
+        <text class="user-phone">{{userInfo.phone || '未绑定手机'}}</text>
+      </view>
+    </view>
+
+    <!-- 设置项 -->
+    <view class="settings-section">
+      <view class="settings-item" bindtap="toggleAiMode">
+        <view class="setting-left">
+          <text class="setting-icon">🧠</text>
+          <view class="setting-info">
+            <text class="setting-name">AI增强模式</text>
+            <text class="setting-desc">开启后可使用智能眼镜AI功能</text>
+          </view>
+        </view>
+        <text class="setting-status">{{aiModeEnabled ? '已开启' : '已关闭'}}</text>
+      </view>
+
+      <view class="settings-item" bindtap="editProfile">
+        <view class="setting-left">
+          <text class="setting-icon">👤</text>
+          <view class="setting-info">
+            <text class="setting-name">个人信息</text>
+            <text class="setting-desc">修改姓名、头像等</text>
+          </view>
+        </view>
+        <text class="setting-arrow">›</text>
+      </view>
+
+      <view class="settings-item" bindtap="aboutUs">
+        <view class="setting-left">
+          <text class="setting-icon">ℹ️</text>
+          <view class="setting-info">
+            <text class="setting-name">关于我们</text>
+            <text class="setting-desc">版本号：1.0.0</text>
+          </view>
+        </view>
+        <text class="setting-arrow">›</text>
+      </view>
+    </view>
+
+    <!-- 退出登录 -->
+    <button wx:if="{{isLoggedIn}}" class="logout-btn" bindtap="handleLogout">退出登录</button>
+  </view>
+</view>

@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>设备详情 - 镜控智联</title>
+    <script src="https://unpkg.byted-static.com/coze/space_ppt_lib/1.0.3-alpha.12/lib/tailwindcss.js"></script>
+    <script src="https://unpkg.byted-static.com/fortawesome/fontawesome-free/6.7.2/js/all.min.js" data-auto-replace-svg="nest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#007AFF',
+                        secondary: '#5856D6',
+                        success: '#34C759',
+                        danger: '#FF3B30',
+                        warning: '#FF9500',
+                        info: '#5AC8FA',
+                        background: '#F2F2F7',
+                        surface: '#FFFFFF',
+                        'text-primary': '#000000',
+                        'text-secondary': '#8E8E93',
+                        'text-tertiary': '#C7C7CC',
+                        'border-light': '#E5E5EA'
+                    },
+                    fontFamily: {
+                        'sf': ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Helvetica Neue', 'Arial', 'sans-serif']
+                    },
+                    boxShadow: {
+                        'card': '0 2px 10px rgba(0, 0, 0, 0.08)',
+                        'button': '0 2px 8px rgba(0, 122, 255, 0.2)'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .device-card-gradient {
+            background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
+        }
+        
+        .status-indicator {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .battery-level {
+            background: linear-gradient(90deg, #34C759 0%, #30D158 100%);
+        }
+        
+        .volume-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 6px;
+            border-radius: 3px;
+            background: #E5E5EA;
+            outline: none;
+        }
+        
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #007AFF;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+        }
+        
+        .volume-slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #007AFF;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+        }
+        
+        .function-item:active {
+            transform: scale(0.98);
+            transition: transform 0.1s ease;
+        }
+    </style>
+</head>
+<body class="bg-background font-sf">
+    <!-- iOS 状态栏 -->
+    <div id="status-bar" class="fixed top-0 left-0 right-0 h-11 bg-surface flex items-center justify-between px-6 text-sm font-medium text-text-primary z-50">
+        <div class="flex items-center space-x-1">
+            <span>9:41</span>
+        </div>
+        <div class="flex items-center space-x-1">
+            <i class="fas fa-signal text-xs"></i>
+            <i class="fas fa-wifi text-xs"></i>
+            <div class="w-6 h-3 border border-text-primary rounded-sm">
+                <div class="w-4 h-1.5 bg-text-primary rounded-sm m-0.5"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主容器 -->
+    <div id="main-container" class="max-w-sm mx-auto bg-surface min-h-screen relative" style="margin-top: 44px;">
+        
+        <!-- 顶部导航栏 -->
+        <header id="top-header" class="bg-surface px-6 py-4 border-b border-border-light">
+            <div id="header-content" class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <button id="back-btn" class="w-10 h-10 bg-background rounded-full flex items-center justify-center">
+                        <i class="fas fa-chevron-left text-primary text-lg"></i>
+                    </button>
+                    <div>
+                        <h1 id="page-title" class="text-lg font-semibold text-text-primary">设备详情</h1>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- 主内容区域 -->
+        <main id="main-content" class="px-6 py-6">
+            
+            <!-- 设备状态卡片 -->
+            <section id="device-card" class="device-card-gradient rounded-3xl p-6 mb-6 text-white shadow-card">
+                <div id="device-header" class="flex items-center justify-between mb-4">
+                    <div>
+                        <h2 id="device-name" class="text-xl font-bold">智能眼镜 Pro</h2>
+                        <p id="device-model" class="text-white/80 text-sm">型号: SG-Pro-2024</p>
+                    </div>
+                    <div id="connection-status" class="flex items-center space-x-2">
+                        <div class="w-2 h-2 bg-success rounded-full status-indicator"></div>
+                        <span id="connection-text" class="text-sm font-medium">已连接</span>
+                    </div>
+                </div>
+                
+                <!-- 设备状态信息 -->
+                <div id="device-status" class="grid grid-cols-2 gap-4 mb-6">
+                    <div id="battery-info" class="bg-white/10 rounded-2xl p-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <i class="fas fa-battery-three-quarters text-lg"></i>
+                            <span id="battery-percentage" class="text-lg font-bold">85%</span>
+                        </div>
+                        <div class="w-full bg-white/20 rounded-full h-2">
+                            <div id="battery-bar" class="battery-level h-2 rounded-full" style="width: 85%"></div>
+                        </div>
+                        <p id="battery-status" class="text-white/80 text-xs mt-1">电量充足</p>
+                    </div>
+                    
+                    <div id="mode-info" class="bg-white/10 rounded-2xl p-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <i class="fas fa-magic text-lg"></i>
+                            <span id="current-mode" class="text-lg font-bold">AI模式</span>
+                        </div>
+                        <p id="current-ai-model" class="text-white/80 text-xs">当前模型: GPT-4</p>
+                        <p id="device-status-text" class="text-white/80 text-xs">运行正常</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 音量控制 -->
+            <section id="volume-control" class="bg-surface rounded-2xl p-6 mb-6 shadow-card border border-border-light">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 bg-info/10 rounded-2xl flex items-center justify-center">
+                            <i class="fas fa-volume-up text-info text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-text-primary">音量控制</h3>
+                            <p class="text-sm text-text-secondary">调节设备音量</p>
+                        </div>
+                    </div>
+                    <span id="volume-value" class="text-lg font-bold text-primary">75%</span>
+                </div>
+                <input type="range" id="volume-slider" class="volume-slider w-full" min="0" max="100" value="75">
+            </section>
+
+            <!-- 功能入口列表 -->
+            <section id="function-list" class="space-y-4">
+                <h3 class="text-lg font-semibold text-text-primary mb-4">设备管理</h3>
+                
+                <div class="space-y-3">
+                    <!-- AI模型管理 -->
+                    <button id="ai-model-manage-btn" class="function-item w-full bg-surface rounded-2xl p-4 shadow-card border border-border-light hover:shadow-lg transition-all duration-200">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center">
+                                    <i class="fas fa-brain text-primary text-xl"></i>
+                                </div>
+                                <div class="text-left">
+                                    <h4 class="font-semibold text-text-primary">AI模型管理</h4>
+                                    <p class="text-sm text-text-secondary">管理和切换智能模型</p>
+                                </div>
+                            </div>
+                            <i class="fas fa-chevron-right text-text-tertiary"></i>
+                        </div>
+                    </button>
+
+                    <!-- 音效设置 -->
+                    <button id="sound-settings-btn" class="function-item w-full bg-surface rounded-2xl p-4 shadow-card border border-border-light hover:shadow-lg transition-all duration-200">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-12 h-12 bg-secondary/10 rounded-2xl flex items-center justify-center">
+                                    <i class="fas fa-music text-secondary text-xl"></i>
+                                </div>
+                                <div class="text-left">
+                                    <h4 class="font-semibold text-text-primary">音效设置</h4>
+                                    <p class="text-sm text-text-secondary">自定义开关机音效</p>
+                                </div>
+                            </div>
+                            <i class="fas fa-chevron-right text-text-tertiary"></i>
+                        </div>
+                    </button>
+
+                    <!-- 功能组件 -->
+                    <button id="component-manage-btn" class="function-item w-full bg-surface rounded-2xl p-4 shadow-card border border-border-light hover:shadow-lg transition-all duration-200">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-12 h-12 bg-warning/10 rounded-2xl flex items-center justify-center">
+                                    <i class="fas fa-puzzle-piece text-warning text-xl"></i>
+                                </div>
+                                <div class="text-left">
+                                    <h4 class="font-semibold text-text-primary">功能组件</h4>
+                                    <p class="text-sm text-text-secondary">下载和管理扩展组件</p>
+                                </div>
+                            </div>
+                            <i class="fas fa-chevron-right text-text-tertiary"></i>
+                        </div>
+                    </button>
+                </div>
+            </section>
+
+        </main>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 解析URL参数的辅助函数
+            function getUrlParams() {
+                const params = {};
+                const queryString = window.location.search.substring(1);
+                const urlParams = new URLSearchParams(queryString);
+                
+                for(const [key, value] of urlParams.entries()) {
+                    params[key] = value;
+                }
+                return params;
+            }
+
+            // 模拟设备数据
+            const mockDevices = {
+                "device1": {
+                    name: "智能眼镜 Pro",
+                    model: "SG-Pro-2024",
+                    battery: 85,
+                    connectionStatus: "已连接",
+                    currentMode: "AI模式",
+                    currentAiModel: "GPT-4",
+                    deviceStatus: "运行正常",
+                    volume: 75
+                },
+                "device2": {
+                    name: "智能眼镜 Lite",
+                    model: "SG-Lite-2024",
+                    battery: 62,
+                    connectionStatus: "未连接",
+                    currentMode: "普通模式",
+                    currentAiModel: "GPT-3.5",
+                    deviceStatus: "待机中",
+                    volume: 60
+                },
+                "device3": {
+                    name: "智能眼镜 Mini",
+                    model: "SG-Mini-2024",
+                    battery: 95,
+                    connectionStatus: "已连接",
+                    currentMode: "省电模式",
+                    currentAiModel: "本地模型",
+                    deviceStatus: "运行正常",
+                    volume: 80
+                }
+            };
+
+            // 获取URL参数
+            const params = getUrlParams();
+            const deviceId = params.deviceId || 'device1'; // 默认显示device1
+
+            // 加载设备数据
+            function loadDeviceData(deviceId) {
+                const device = mockDevices[deviceId];
+                if (!device) {
+                    console.error('设备未找到');
+                    return;
+                }
+
+                // 更新设备信息
+                document.querySelector('#device-name').textContent = device.name;
+                document.querySelector('#device-model').textContent = `型号: ${device.model}`;
+                document.querySelector('#battery-percentage').textContent = `${device.battery}%`;
+                document.querySelector('#battery-bar').style.width = `${device.battery}%`;
+                document.querySelector('#current-mode').textContent = device.currentMode;
+                document.querySelector('#current-ai-model').textContent = `当前模型: ${device.currentAiModel}`;
+                document.querySelector('#device-status-text').textContent = device.deviceStatus;
+                document.querySelector('#volume-slider').value = device.volume;
+                document.querySelector('#volume-value').textContent = `${device.volume}%`;
+
+                // 更新连接状态
+                const connectionStatusElement = document.querySelector('#connection-status div');
+                const connectionTextElement = document.querySelector('#connection-text');
+                
+                if (device.connectionStatus === '已连接') {
+                    connectionStatusElement.className = 'w-2 h-2 bg-success rounded-full status-indicator';
+                    connectionTextElement.textContent = '已连接';
+                } else {
+                    connectionStatusElement.className = 'w-2 h-2 bg-text-tertiary rounded-full';
+                    connectionTextElement.textContent = '未连接';
+                }
+
+                // 更新电量状态文本
+                const batteryStatusElement = document.querySelector('#battery-status');
+                if (device.battery >= 80) {
+                    batteryStatusElement.textContent = '电量充足';
+                } else if (device.battery >= 50) {
+                    batteryStatusElement.textContent = '电量中等';
+                } else if (device.battery >= 20) {
+                    batteryStatusElement.textContent = '电量较低';
+                } else {
+                    batteryStatusElement.textContent = '电量不足';
+                }
+            }
+
+            // 初始化页面数据
+            loadDeviceData(deviceId);
+
+            // 返回按钮点击事件
+            document.querySelector('#back-btn').addEventListener('click', function() {
+                // 检查来源页面，默认返回首页
+                const referrer = document.referrer;
+                if (referrer.includes('P-DEVICE_LIST.html')) {
+                    window.location.href = 'P-DEVICE_LIST.html';
+                } else {
+                    window.location.href = 'P-HOME.html';
+                }
+            });
+
+            // AI模型管理按钮点击事件
+            document.querySelector('#ai-model-manage-btn').addEventListener('click', function() {
+                window.location.href = `P-AI_MODEL_MANAGE.html?deviceId=${deviceId}`;
+            });
+
+            // 音效设置按钮点击事件
+            document.querySelector('#sound-settings-btn').addEventListener('click', function() {
+                window.location.href = `P-SOUND_SETTINGS.html?deviceId=${deviceId}`;
+            });
+
+            // 功能组件管理按钮点击事件
+            document.querySelector('#component-manage-btn').addEventListener('click', function() {
+                window.location.href = `P-COMPONENT_MANAGE.html?deviceId=${deviceId}`;
+            });
+
+            // 音量滑块事件
+            const volumeSlider = document.querySelector('#volume-slider');
+            const volumeValue = document.querySelector('#volume-value');
+
+            volumeSlider.addEventListener('input', function() {
+                const value = this.value;
+                volumeValue.textContent = `${value}%`;
+                
+                // 模拟向设备发送音量调节指令
+                console.log(`向设备 ${deviceId} 发送音量调节指令: ${value}%`);
+                
+                // 这里可以添加实际的设备通信逻辑
+                // 在实际应用中，这里会调用蓝牙/Wi-Fi API发送指令
+            });
+
+            volumeSlider.addEventListener('change', function() {
+                // 音量调节完成后的确认
+                console.log(`设备 ${deviceId} 音量已调节至: ${this.value}%`);
+                
+                // 更新设备数据中的音量值
+                if (mockDevices[deviceId]) {
+                    mockDevices[deviceId].volume = parseInt(this.value);
+                }
+            });
+
+            // 模拟设备状态实时更新
+            setInterval(function() {
+                // 随机更新电量（模拟）
+                if (mockDevices[deviceId] && mockDevices[deviceId].connectionStatus === '已连接') {
+                    const currentBattery = mockDevices[deviceId].battery;
+                    if (currentBattery > 0) {
+                        // 每30秒减少1%电量（模拟耗电）
+                        mockDevices[deviceId].battery = Math.max(0, currentBattery - 0.033);
+                        
+                        // 更新UI
+                        const newBattery = Math.round(mockDevices[deviceId].battery);
+                        document.querySelector('#battery-percentage').textContent = `${newBattery}%`;
+                        document.querySelector('#battery-bar').style.width = `${newBattery}%`;
+                        
+                        // 更新电量状态文本
+                        const batteryStatusElement = document.querySelector('#battery-status');
+                        if (newBattery >= 80) {
+                            batteryStatusElement.textContent = '电量充足';
+                        } else if (newBattery >= 50) {
+                            batteryStatusElement.textContent = '电量中等';
+                        } else if (newBattery >= 20) {
+                            batteryStatusElement.textContent = '电量较低';
+                        } else {
+                            batteryStatusElement.textContent = '电量不足';
+                        }
+                    }
+                }
+            }, 30000); // 30秒更新一次
+        });
+    </script>
+</body>
+</html>

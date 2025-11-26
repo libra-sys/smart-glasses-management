@@ -1,0 +1,98 @@
+<!-- 音效设置页面 -->
+<view class="container">
+  <view class="page-header">
+    <text class="page-title">音效设置</text>
+    <text class="page-subtitle">自定义您的音效体验</text>
+  </view>
+
+  <!-- 音效开关 -->
+  <view class="section">
+    <text class="section-title">基础设置</text>
+    <view class="setting-item">
+      <view class="item-left">
+        <text class="item-icon">🔔</text>
+        <view class="item-info">
+          <text class="item-name">提示音</text>
+          <text class="item-desc">操作时播放提示音</text>
+        </view>
+      </view>
+      <switch checked="{{soundEnabled}}" bindchange="toggleSound" color="#007AFF"/>
+    </view>
+
+    <view class="setting-item">
+      <view class="item-left">
+        <text class="item-icon">📣</text>
+        <view class="item-info">
+          <text class="item-name">语音播报</text>
+          <text class="item-desc">重要信息语音提醒</text>
+        </view>
+      </view>
+      <switch checked="{{voiceEnabled}}" bindchange="toggleVoice" color="#007AFF"/>
+    </view>
+  </view>
+
+  <!-- 音效选择 -->
+  <view class="section">
+    <text class="section-title">提示音选择</text>
+    
+    <!-- 自定义音效文件 -->
+    <view class="custom-sound">
+      <view class="custom-header">
+        <text class="custom-title">自定义音效</text>
+        <button class="choose-file-btn" bindtap="chooseAudioFile">
+          <text class="btn-icon">📁</text>
+          <text class="btn-text">选择文件</text>
+        </button>
+      </view>
+      <view class="selected-file" wx:if="{{customAudioPath}}">
+        <text class="file-icon">🎵</text>
+        <text class="file-name">{{customAudioName}}</text>
+        <button class="play-btn" catchtap="playCustomAudio">试听</button>
+        <button class="remove-btn" catchtap="removeCustomAudio">×</button>
+      </view>
+      <view class="no-file" wx:else>
+        <text class="no-file-text">未选择音效文件</text>
+      </view>
+    </view>
+
+    <!-- 内置音效 -->
+    <text class="subsection-title">内置音效</text>
+    <view class="sound-list">
+      <view 
+        class="sound-item {{currentSound === item.id ? 'active' : ''}}" 
+        wx:for="{{soundList}}" 
+        wx:key="id"
+        bindtap="selectSound"
+        data-id="{{item.id}}">
+        <text class="sound-name">{{item.name}}</text>
+        <text class="sound-icon" wx:if="{{currentSound === item.id}}">✓</text>
+        <button class="play-btn" catchtap="playSound" data-id="{{item.id}}">试听</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 音量调节 -->
+  <view class="section">
+    <text class="section-title">音量调节</text>
+    <view class="volume-control">
+      <text class="volume-icon">🔉</text>
+      <slider 
+        class="volume-slider"
+        value="{{volume}}" 
+        min="0" 
+        max="100" 
+        step="1"
+        activeColor="#007AFF"
+        backgroundColor="#E5E5EA"
+        block-size="20"
+        bindchange="volumeChange"
+        show-value />
+      <text class="volume-icon">🔊</text>
+    </view>
+  </view>
+
+  <!-- 保存按钮 -->
+  <view class="footer">
+    <button class="save-btn" bindtap="saveSettings">保存设置</button>
+  </view>
+</view>

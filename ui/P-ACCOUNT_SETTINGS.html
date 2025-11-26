@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的 - 镜控智联</title>
+    <script src="https://unpkg.byted-static.com/coze/space_ppt_lib/1.0.3-alpha.12/lib/tailwindcss.js"></script>
+    <script src="https://unpkg.byted-static.com/fortawesome/fontawesome-free/6.7.2/js/all.min.js" data-auto-replace-svg="nest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#007AFF',
+                        secondary: '#5856D6',
+                        success: '#34C759',
+                        danger: '#FF3B30',
+                        warning: '#FF9500',
+                        info: '#5AC8FA',
+                        background: '#F2F2F7',
+                        surface: '#FFFFFF',
+                        'text-primary': '#000000',
+                        'text-secondary': '#8E8E93',
+                        'text-tertiary': '#C7C7CC',
+                        'border-light': '#E5E5EA'
+                    },
+                    fontFamily: {
+                        'sf': ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Helvetica Neue', 'Arial', 'sans-serif']
+                    },
+                    boxShadow: {
+                        'card': '0 2px 10px rgba(0, 0, 0, 0.08)',
+                        'button': '0 2px 8px rgba(0, 122, 255, 0.2)'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .nav-active {
+            color: #007AFF;
+        }
+        
+        .safe-bottom {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .setting-item-hover:active {
+            background-color: #F2F2F7;
+        }
+
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-content {
+            animation: modalSlideUp 0.3s ease-out;
+        }
+
+        @keyframes modalSlideUp {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body class="bg-background font-sf">
+    <!-- iOS 状态栏 -->
+    <div id="status-bar" class="fixed top-0 left-0 right-0 h-11 bg-surface flex items-center justify-between px-6 text-sm font-medium text-text-primary z-50">
+        <div class="flex items-center space-x-1">
+            <span>9:41</span>
+        </div>
+        <div class="flex items-center space-x-1">
+            <i class="fas fa-signal text-xs"></i>
+            <i class="fas fa-wifi text-xs"></i>
+            <div class="w-6 h-3 border border-text-primary rounded-sm">
+                <div class="w-4 h-1.5 bg-text-primary rounded-sm m-0.5"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主容器 -->
+    <div id="main-container" class="max-w-sm mx-auto bg-surface min-h-screen relative" style="margin-top: 44px;">
+        
+        <!-- 顶部导航栏 -->
+        <header id="top-header" class="bg-surface px-6 py-4 border-b border-border-light">
+            <div id="header-content" class="flex items-center justify-center">
+                <h1 id="page-title" class="text-xl font-bold text-text-primary">我的</h1>
+            </div>
+        </header>
+
+        <!-- 主内容区域 -->
+        <main id="main-content" class="px-6 py-6 pb-24">
+            
+            <!-- 用户信息区域 -->
+            <section id="user-info-section" class="bg-surface rounded-3xl p-6 mb-6 shadow-card border border-border-light">
+                <div id="user-profile" class="flex items-center space-x-4">
+                    <img id="user-avatar" src="https://s.coze.cn/image/_qGlBcK7kN0/" 
+                         alt="用户头像" data-category="人物" 
+                         class="w-16 h-16 rounded-full object-cover">
+                    <div id="user-details" class="flex-1">
+                        <h2 id="user-nickname" class="text-xl font-bold text-text-primary mb-1">张先生</h2>
+                        <p id="user-id" class="text-sm text-text-secondary">ID: 1234567890</p>
+                        <p id="user-email" class="text-sm text-text-secondary">zhang@example.com</p>
+                    </div>
+                    <button id="edit-profile-btn" class="w-10 h-10 bg-background rounded-full flex items-center justify-center">
+                        <i class="fas fa-edit text-text-secondary"></i>
+                    </button>
+                </div>
+            </section>
+
+            <!-- 设置列表 -->
+            <section id="settings-section" class="space-y-4">
+                
+                <!-- 账户设置 -->
+                <div id="account-settings" class="bg-surface rounded-3xl p-1 shadow-card border border-border-light">
+                    <h3 id="account-settings-title" class="px-5 py-3 text-sm font-medium text-text-secondary">账户设置</h3>
+                    
+                    <button id="personal-info-item" class="w-full flex items-center justify-between px-5 py-4 border-b border-border-light setting-item-hover">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-primary/10 rounded-2xl flex items-center justify-center">
+                                <i class="fas fa-user text-primary"></i>
+                            </div>
+                            <div class="text-left">
+                                <p class="font-medium text-text-primary">个人资料</p>
+                                <p class="text-sm text-text-secondary">修改头像、昵称</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right text-text-tertiary"></i>
+                    </button>
+                    
+                    <button id="change-password-item" class="w-full flex items-center justify-between px-5 py-4 setting-item-hover">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-warning/10 rounded-2xl flex items-center justify-center">
+                                <i class="fas fa-lock text-warning"></i>
+                            </div>
+                            <div class="text-left">
+                                <p class="font-medium text-text-primary">修改密码</p>
+                                <p class="text-sm text-text-secondary">更改登录密码</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right text-text-tertiary"></i>
+                    </button>
+                </div>
+
+                <!-- 设备管理 -->
+                <div id="device-management" class="bg-surface rounded-3xl p-1 shadow-card border border-border-light">
+                    <h3 id="device-management-title" class="px-5 py-3 text-sm font-medium text-text-secondary">设备管理</h3>
+                    
+                    <button id="device-list-item" class="w-full flex items-center justify-between px-5 py-4 setting-item-hover">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-secondary/10 rounded-2xl flex items-center justify-center">
+                                <i class="fas fa-mobile-alt text-secondary"></i>
+                            </div>
+                            <div class="text-left">
+                                <p class="font-medium text-text-primary">绑定设备管理</p>
+                                <p class="text-sm text-text-secondary">管理已绑定的设备</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right text-text-tertiary"></i>
+                    </button>
+                </div>
+
+                <!-- 法律条款 -->
+                <div id="legal-section" class="bg-surface rounded-3xl p-1 shadow-card border border-border-light">
+                    <h3 id="legal-section-title" class="px-5 py-3 text-sm font-medium text-text-secondary">法律条款</h3>
+                    
+                    <button id="privacy-policy-item" class="w-full flex items-center justify-between px-5 py-4 border-b border-border-light setting-item-hover">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-info/10 rounded-2xl flex items-center justify-center">
+                                <i class="fas fa-shield-alt text-info"></i>
+                            </div>
+                            <div class="text-left">
+                                <p class="font-medium text-text-primary">隐私政策</p>
+                                <p class="text-sm text-text-secondary">查看隐私保护政策</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right text-text-tertiary"></i>
+                    </button>
+                    
+                    <button id="user-agreement-item" class="w-full flex items-center justify-between px-5 py-4 setting-item-hover">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-success/10 rounded-2xl flex items-center justify-center">
+                                <i class="fas fa-file-contract text-success"></i>
+                            </div>
+                            <div class="text-left">
+                                <p class="font-medium text-text-primary">用户协议</p>
+                                <p class="text-sm text-text-secondary">查看用户服务协议</p>
+                            </div>
+                        </div>
+                        <i class="fas fa-chevron-right text-text-tertiary"></i>
+                    </button>
+                </div>
+
+                <!-- 退出登录 -->
+                <div id="logout-section" class="pt-4">
+                    <button id="logout-btn" class="w-full bg-danger text-white py-4 rounded-3xl font-medium shadow-card">
+                        <i class="fas fa-sign-out-alt mr-2"></i>
+                        退出登录
+                    </button>
+                </div>
+
+            </section>
+
+        </main>
+
+        <!-- 底部导航栏 -->
+        <nav id="bottom-nav" class="fixed bottom-0 left-0 right-0 bg-surface border-t border-border-light flex justify-around items-center h-20 px-2 safe-bottom z-40">
+            <a id="nav-home" href="P-HOME.html" class="flex flex-col items-center p-2 text-text-secondary">
+                <i class="fas fa-home text-xl mb-1"></i>
+                <span class="text-xs">首页</span>
+            </a>
+            <a id="nav-devices" href="P-DEVICE_LIST.html" class="flex flex-col items-center p-2 text-text-secondary">
+                <i class="fas fa-mobile-alt text-xl mb-1"></i>
+                <span class="text-xs">设备</span>
+            </a>
+            <a id="nav-profile" href="#" class="flex flex-col items-center p-2 nav-active">
+                <i class="fas fa-user text-xl mb-1"></i>
+                <span class="text-xs">我的</span>
+            </a>
+        </nav>
+
+    </div>
+
+    <!-- 退出登录确认弹窗 -->
+    <div id="logout-modal" class="fixed inset-0 z-50 hidden">
+        <div class="modal-overlay absolute inset-0"></div>
+        <div class="relative flex items-end justify-center min-h-screen p-4">
+            <div class="modal-content bg-surface rounded-t-3xl w-full max-w-sm p-6">
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-danger/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-sign-out-alt text-danger text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-text-primary mb-2">确认退出登录</h3>
+                    <p class="text-text-secondary mb-6">退出后需要重新登录才能使用应用</p>
+                    
+                    <div class="flex space-x-3">
+                        <button id="cancel-logout-btn" class="flex-1 bg-background text-text-primary py-3 rounded-2xl font-medium">
+                            取消
+                        </button>
+                        <button id="confirm-logout-btn" class="flex-1 bg-danger text-white py-3 rounded-2xl font-medium">
+                            确认退出
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 个人资料编辑弹窗 -->
+    <div id="profile-modal" class="fixed inset-0 z-50 hidden">
+        <div class="modal-overlay absolute inset-0"></div>
+        <div class="relative flex items-end justify-center min-h-screen p-4">
+            <div class="modal-content bg-surface rounded-t-3xl w-full max-w-sm p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-bold text-text-primary">编辑个人资料</h3>
+                    <button id="close-profile-modal" class="w-8 h-8 flex items-center justify-center">
+                        <i class="fas fa-times text-text-secondary"></i>
+                    </button>
+                </div>
+                
+                <form id="profile-form" class="space-y-6">
+                    <div class="text-center">
+                        <img id="profile-avatar" src="https://s.coze.cn/image/ebZRwxax6_E/" 
+                             alt="用户头像" data-category="人物" 
+                             class="w-20 h-20 rounded-full object-cover mx-auto mb-3">
+                        <button type="button" id="change-avatar-btn" class="text-primary text-sm font-medium">
+                            <i class="fas fa-camera mr-1"></i>更换头像
+                        </button>
+                    </div>
+                    
+                    <div>
+                        <label for="nickname-input" class="block text-sm font-medium text-text-secondary mb-2">昵称</label>
+                        <input type="text" id="nickname-input" name="nickname" value="张先生" 
+                               class="w-full px-4 py-3 border border-border-light rounded-2xl focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20">
+                    </div>
+                    
+                    <div class="flex space-x-3 pt-4">
+                        <button type="button" id="cancel-profile-btn" class="flex-1 bg-background text-text-primary py-3 rounded-2xl font-medium">
+                            取消
+                        </button>
+                        <button type="submit" id="save-profile-btn" class="flex-1 bg-primary text-white py-3 rounded-2xl font-medium">
+                            保存
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 修改密码弹窗 -->
+    <div id="password-modal" class="fixed inset-0 z-50 hidden">
+        <div class="modal-overlay absolute inset-0"></div>
+        <div class="relative flex items-end justify-center min-h-screen p-4">
+            <div class="modal-content bg-surface rounded-t-3xl w-full max-w-sm p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-bold text-text-primary">修改密码</h3>
+                    <button id="close-password-modal" class="w-8 h-8 flex items-center justify-center">
+                        <i class="fas fa-times text-text-secondary"></i>
+                    </button>
+                </div>
+                
+                <form id="password-form" class="space-y-4">
+                    <div>
+                        <label for="current-password" class="block text-sm font-medium text-text-secondary mb-2">当前密码</label>
+                        <input type="password" id="current-password" name="currentPassword" placeholder="请输入当前密码"
+                               class="w-full px-4 py-3 border border-border-light rounded-2xl focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20">
+                    </div>
+                    
+                    <div>
+                        <label for="new-password" class="block text-sm font-medium text-text-secondary mb-2">新密码</label>
+                        <input type="password" id="new-password" name="newPassword" placeholder="请输入新密码"
+                               class="w-full px-4 py-3 border border-border-light rounded-2xl focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20">
+                    </div>
+                    
+                    <div>
+                        <label for="confirm-password" class="block text-sm font-medium text-text-secondary mb-2">确认新密码</label>
+                        <input type="password" id="confirm-password" name="confirmPassword" placeholder="请再次输入新密码"
+                               class="w-full px-4 py-3 border border-border-light rounded-2xl focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20">
+                    </div>
+                    
+                    <div class="flex space-x-3 pt-4">
+                        <button type="button" id="cancel-password-btn" class="flex-1 bg-background text-text-primary py-3 rounded-2xl font-medium">
+                            取消
+                        </button>
+                        <button type="submit" id="save-password-btn" class="flex-1 bg-primary text-white py-3 rounded-2xl font-medium">
+                            保存
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // 底部导航栏点击事件
+            document.querySelector('#nav-home').addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = 'P-HOME.html';
+            });
+
+            document.querySelector('#nav-devices').addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = 'P-DEVICE_LIST.html';
+            });
+
+            document.querySelector('#nav-profile').addEventListener('click', function(e) {
+                e.preventDefault();
+                // 已在当前页面，无需操作
+            });
+
+            // 个人资料编辑按钮点击事件
+            document.querySelector('#edit-profile-btn').addEventListener('click', function() {
+                document.querySelector('#profile-modal').classList.remove('hidden');
+            });
+
+            // 个人资料设置项点击事件
+            document.querySelector('#personal-info-item').addEventListener('click', function() {
+                document.querySelector('#profile-modal').classList.remove('hidden');
+            });
+
+            // 修改密码设置项点击事件
+            document.querySelector('#change-password-item').addEventListener('click', function() {
+                document.querySelector('#password-modal').classList.remove('hidden');
+            });
+
+            // 设备管理设置项点击事件
+            document.querySelector('#device-list-item').addEventListener('click', function() {
+                window.location.href = 'P-DEVICE_LIST.html';
+            });
+
+            // 隐私政策设置项点击事件
+            document.querySelector('#privacy-policy-item').addEventListener('click', function() {
+                window.location.href = 'P-PRIVACY_POLICY.html';
+            });
+
+            // 用户协议设置项点击事件
+            document.querySelector('#user-agreement-item').addEventListener('click', function() {
+                window.location.href = 'P-USER_AGREEMENT.html';
+            });
+
+            // 退出登录按钮点击事件
+            document.querySelector('#logout-btn').addEventListener('click', function() {
+                document.querySelector('#logout-modal').classList.remove('hidden');
+            });
+
+            // 退出登录弹窗事件
+            document.querySelector('#cancel-logout-btn').addEventListener('click', function() {
+                document.querySelector('#logout-modal').classList.add('hidden');
+            });
+
+            document.querySelector('#confirm-logout-btn').addEventListener('click', function() {
+                window.location.href = 'P-LOGIN_REGISTER.html';
+            });
+
+            // 个人资料弹窗事件
+            document.querySelector('#close-profile-modal').addEventListener('click', function() {
+                document.querySelector('#profile-modal').classList.add('hidden');
+            });
+
+            document.querySelector('#cancel-profile-btn').addEventListener('click', function() {
+                document.querySelector('#profile-modal').classList.add('hidden');
+            });
+
+            document.querySelector('#profile-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const newNickname = document.querySelector('#nickname-input').value.trim();
+                if (newNickname) {
+                    document.querySelector('#user-nickname').textContent = newNickname;
+                    document.querySelector('#profile-modal').classList.add('hidden');
+                    alert('个人资料修改成功');
+                }
+            });
+
+            // 更换头像按钮点击事件
+            document.querySelector('#change-avatar-btn').addEventListener('click', function() {
+                console.log('需要调用第三方接口实现相机拍照或相册选择功能');
+                // 注释：此功能需要调用设备相机API或相册API，在原型阶段仅做UI展示
+            });
+
+            // 修改密码弹窗事件
+            document.querySelector('#close-password-modal').addEventListener('click', function() {
+                document.querySelector('#password-modal').classList.add('hidden');
+            });
+
+            document.querySelector('#cancel-password-btn').addEventListener('click', function() {
+                document.querySelector('#password-modal').classList.add('hidden');
+            });
+
+            document.querySelector('#password-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const currentPassword = document.querySelector('#current-password').value;
+                const newPassword = document.querySelector('#new-password').value;
+                const confirmPassword = document.querySelector('#confirm-password').value;
+                
+                if (!currentPassword || !newPassword || !confirmPassword) {
+                    alert('请填写完整的密码信息');
+                    return;
+                }
+                
+                if (newPassword !== confirmPassword) {
+                    alert('新密码与确认密码不一致');
+                    return;
+                }
+                
+                if (newPassword.length < 6) {
+                    alert('新密码长度不能少于6位');
+                    return;
+                }
+                
+                // 模拟密码修改成功
+                document.querySelector('#password-modal').classList.add('hidden');
+                // 清空表单
+                document.querySelector('#password-form').reset();
+                alert('密码修改成功');
+            });
+
+            // 点击弹窗背景关闭弹窗
+            document.querySelector('#logout-modal .modal-overlay').addEventListener('click', function() {
+                document.querySelector('#logout-modal').classList.add('hidden');
+            });
+
+            document.querySelector('#profile-modal .modal-overlay').addEventListener('click', function() {
+                document.querySelector('#profile-modal').classList.add('hidden');
+            });
+
+            document.querySelector('#password-modal .modal-overlay').addEventListener('click', function() {
+                document.querySelector('#password-modal').classList.add('hidden');
+            });
+        });
+    </script>
+</body>
+</html>

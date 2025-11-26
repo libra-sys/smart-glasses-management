@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>功能组件 - 镜控智联</title>
+    <script src="https://unpkg.byted-static.com/coze/space_ppt_lib/1.0.3-alpha.12/lib/tailwindcss.js"></script>
+    <script src="https://unpkg.byted-static.com/fortawesome/fontawesome-free/6.7.2/js/all.min.js" data-auto-replace-svg="nest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#007AFF',
+                        secondary: '#5856D6',
+                        success: '#34C759',
+                        danger: '#FF3B30',
+                        warning: '#FF9500',
+                        info: '#5AC8FA',
+                        background: '#F2F2F7',
+                        surface: '#FFFFFF',
+                        'text-primary': '#000000',
+                        'text-secondary': '#8E8E93',
+                        'text-tertiary': '#C7C7CC',
+                        'border-light': '#E5E5EA'
+                    },
+                    fontFamily: {
+                        'sf': ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Helvetica Neue', 'Arial', 'sans-serif']
+                    },
+                    boxShadow: {
+                        'card': '0 2px 10px rgba(0, 0, 0, 0.08)',
+                        'button': '0 2px 8px rgba(0, 122, 255, 0.2)'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .component-card {
+            transition: all 0.3s ease;
+        }
+        
+        .component-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+        }
+        
+        .download-progress {
+            background: linear-gradient(90deg, #007AFF 0%, #5856D6 100%);
+            transition: width 0.3s ease;
+        }
+        
+        .status-badge {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 12px;
+        }
+        
+        .status-installed {
+            background-color: #34C759;
+            color: white;
+        }
+        
+        .status-downloadable {
+            background-color: #FF9500;
+            color: white;
+        }
+        
+        .status-updatable {
+            background-color: #5AC8FA;
+            color: white;
+        }
+        
+        .btn-primary {
+            background-color: #007AFF;
+            color: white;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-primary:hover {
+            background-color: #0056CC;
+        }
+        
+        .btn-success {
+            background-color: #34C759;
+            color: white;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-success:hover {
+            background-color: #28A745;
+        }
+        
+        .btn-danger {
+            background-color: #FF3B30;
+            color: white;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-danger:hover {
+            background-color: #DC3545;
+        }
+        
+        .btn-disabled {
+            background-color: #C7C7CC;
+            color: #8E8E93;
+            cursor: not-allowed;
+        }
+        
+        .safe-bottom {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+    </style>
+</head>
+<body class="bg-background font-sf">
+    <!-- iOS 状态栏 -->
+    <div id="status-bar" class="fixed top-0 left-0 right-0 h-11 bg-surface flex items-center justify-between px-6 text-sm font-medium text-text-primary z-50">
+        <div class="flex items-center space-x-1">
+            <span>9:41</span>
+        </div>
+        <div class="flex items-center space-x-1">
+            <i class="fas fa-signal text-xs"></i>
+            <i class="fas fa-wifi text-xs"></i>
+            <div class="w-6 h-3 border border-text-primary rounded-sm">
+                <div class="w-4 h-1.5 bg-text-primary rounded-sm m-0.5"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主容器 -->
+    <div id="main-container" class="max-w-sm mx-auto bg-background min-h-screen relative" style="margin-top: 44px;">
+        
+        <!-- 顶部导航栏 -->
+        <header id="top-header" class="bg-surface px-6 py-4 border-b border-border-light">
+            <div id="header-content" class="flex items-center">
+                <button id="back-btn" class="w-10 h-10 flex items-center justify-center mr-4">
+                    <i class="fas fa-chevron-left text-primary text-lg"></i>
+                </button>
+                <h1 id="page-title" class="text-xl font-semibold text-text-primary">功能组件</h1>
+            </div>
+        </header>
+
+        <!-- 主内容区域 -->
+        <main id="main-content" class="px-6 py-6">
+            
+            <!-- 组件列表 -->
+            <section id="components-section" class="space-y-4">
+                
+                <!-- 语音导航组件 -->
+                <div id="component-voice-nav" class="component-card bg-surface rounded-2xl p-4 shadow-card border border-border-light">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center">
+                                <i class="fas fa-directions text-primary text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-text-primary">语音导航</h3>
+                                <p class="text-sm text-text-secondary">版本 1.2.0</p>
+                            </div>
+                        </div>
+                        <span class="status-badge status-installed">已安装</span>
+                    </div>
+                    <p class="text-sm text-text-secondary mb-4">智能语音导航，支持实时路况播报和路线规划</p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-text-secondary">大小: 8.5 MB</span>
+                        <button id="voice-nav-toggle" class="btn-success px-4 py-2 rounded-xl text-sm font-medium">
+                            <i class="fas fa-check mr-1"></i>已启用
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 天气预报组件 -->
+                <div id="component-weather" class="component-card bg-surface rounded-2xl p-4 shadow-card border border-border-light">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-12 h-12 bg-warning/10 rounded-2xl flex items-center justify-center">
+                                <i class="fas fa-cloud-sun text-warning text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-text-primary">天气预报</h3>
+                                <p class="text-sm text-text-secondary">版本 1.1.5</p>
+                            </div>
+                        </div>
+                        <span class="status-badge status-installed">已安装</span>
+                    </div>
+                    <p class="text-sm text-text-secondary mb-4">实时天气信息，支持未来7天天气预报</p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-text-secondary">大小: 4.2 MB</span>
+                        <button id="weather-toggle" class="btn-danger px-4 py-2 rounded-xl text-sm font-medium">
+                            <i class="fas fa-times mr-1"></i>已禁用
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 消息同步组件 -->
+                <div id="component-message-sync" class="component-card bg-surface rounded-2xl p-4 shadow-card border border-border-light">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-12 h-12 bg-secondary/10 rounded-2xl flex items-center justify-center">
+                                <i class="fas fa-comment-dots text-secondary text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-text-primary">消息同步</h3>
+                                <p class="text-sm text-text-secondary">版本 1.3.2</p>
+                            </div>
+                        </div>
+                        <span class="status-badge status-updatable">可更新</span>
+                    </div>
+                    <p class="text-sm text-text-secondary mb-4">同步手机消息，支持微信、短信等应用消息播报</p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-text-secondary">大小: 6.8 MB</span>
+                        <div class="flex space-x-2">
+                            <button id="message-sync-update" class="btn-primary px-3 py-2 rounded-xl text-sm font-medium">
+                                <i class="fas fa-download mr-1"></i>更新
+                            </button>
+                            <button id="message-sync-toggle" class="btn-success px-3 py-2 rounded-xl text-sm font-medium">
+                                <i class="fas fa-check mr-1"></i>已启用
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 健康监测组件 -->
+                <div id="component-health" class="component-card bg-surface rounded-2xl p-4 shadow-card border border-border-light">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-12 h-12 bg-success/10 rounded-2xl flex items-center justify-center">
+                                <i class="fas fa-heartbeat text-success text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-text-primary">健康监测</h3>
+                                <p class="text-sm text-text-secondary">版本 1.0.8</p>
+                            </div>
+                        </div>
+                        <span class="status-badge status-downloadable">可下载</span>
+                    </div>
+                    <p class="text-sm text-text-secondary mb-4">心率监测、步数统计等健康数据追踪功能</p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-text-secondary">大小: 12.3 MB</span>
+                        <button id="health-download" class="btn-primary px-4 py-2 rounded-xl text-sm font-medium">
+                            <i class="fas fa-download mr-1"></i>下载
+                        </button>
+                    </div>
+                    <!-- 下载进度条 -->
+                    <div id="health-progress" class="mt-3 hidden">
+                        <div class="w-full bg-border-light rounded-full h-2">
+                            <div class="download-progress h-2 rounded-full" style="width: 0%"></div>
+                        </div>
+                        <p class="text-xs text-text-secondary mt-1">下载中: 0%</p>
+                    </div>
+                </div>
+
+                <!-- 音乐控制组件 -->
+                <div id="component-music" class="component-card bg-surface rounded-2xl p-4 shadow-card border border-border-light">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-12 h-12 bg-info/10 rounded-2xl flex items-center justify-center">
+                                <i class="fas fa-music text-info text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-text-primary">音乐控制</h3>
+                                <p class="text-sm text-text-secondary">版本 1.1.1</p>
+                            </div>
+                        </div>
+                        <span class="status-badge status-downloadable">可下载</span>
+                    </div>
+                    <p class="text-sm text-text-secondary mb-4">控制手机音乐播放，支持主流音乐应用</p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-text-secondary">大小: 3.7 MB</span>
+                        <button id="music-download" class="btn-primary px-4 py-2 rounded-xl text-sm font-medium">
+                            <i class="fas fa-download mr-1"></i>下载
+                        </button>
+                    </div>
+                    <!-- 下载进度条 -->
+                    <div id="music-progress" class="mt-3 hidden">
+                        <div class="w-full bg-border-light rounded-full h-2">
+                            <div class="download-progress h-2 rounded-full" style="width: 0%"></div>
+                        </div>
+                        <p class="text-xs text-text-secondary mt-1">下载中: 0%</p>
+                    </div>
+                </div>
+
+                <!-- 新闻资讯组件 -->
+                <div id="component-news" class="component-card bg-surface rounded-2xl p-4 shadow-card border border-border-light">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-12 h-12 bg-danger/10 rounded-2xl flex items-center justify-center">
+                                <i class="fas fa-newspaper text-danger text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-text-primary">新闻资讯</h3>
+                                <p class="text-sm text-text-secondary">版本 1.0.5</p>
+                            </div>
+                        </div>
+                        <span class="status-badge status-downloadable">可下载</span>
+                    </div>
+                    <p class="text-sm text-text-secondary mb-4">个性化新闻推送，支持语音播报新闻内容</p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-text-secondary">大小: 5.9 MB</span>
+                        <button id="news-download" class="btn-primary px-4 py-2 rounded-xl text-sm font-medium">
+                            <i class="fas fa-download mr-1"></i>下载
+                        </button>
+                    </div>
+                    <!-- 下载进度条 -->
+                    <div id="news-progress" class="mt-3 hidden">
+                        <div class="w-full bg-border-light rounded-full h-2">
+                            <div class="download-progress h-2 rounded-full" style="width: 0%"></div>
+                        </div>
+                        <p class="text-xs text-text-secondary mt-1">下载中: 0%</p>
+                    </div>
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // 返回按钮点击事件
+            document.querySelector('#back-btn').addEventListener('click', function() {
+                window.location.href = 'P-DEVICE_DETAIL.html';
+            });
+
+            // 语音导航组件切换
+            document.querySelector('#voice-nav-toggle').addEventListener('click', function() {
+                const isEnabled = this.textContent.includes('已启用');
+                
+                if (isEnabled) {
+                    this.textContent = '禁用';
+                    this.className = 'btn-danger px-4 py-2 rounded-xl text-sm font-medium';
+                    this.innerHTML = '<i class="fas fa-times mr-1"></i>禁用';
+                    alert('语音导航已禁用');
+                } else {
+                    this.textContent = '已启用';
+                    this.className = 'btn-success px-4 py-2 rounded-xl text-sm font-medium';
+                    this.innerHTML = '<i class="fas fa-check mr-1"></i>已启用';
+                    alert('语音导航已启用');
+                }
+            });
+
+            // 天气预报组件切换
+            document.querySelector('#weather-toggle').addEventListener('click', function() {
+                const isEnabled = this.textContent.includes('已启用');
+                
+                if (isEnabled) {
+                    this.textContent = '禁用';
+                    this.className = 'btn-danger px-4 py-2 rounded-xl text-sm font-medium';
+                    this.innerHTML = '<i class="fas fa-times mr-1"></i>禁用';
+                    alert('天气预报已禁用');
+                } else {
+                    this.textContent = '已启用';
+                    this.className = 'btn-success px-4 py-2 rounded-xl text-sm font-medium';
+                    this.innerHTML = '<i class="fas fa-check mr-1"></i>已启用';
+                    alert('天气预报已启用');
+                }
+            });
+
+            // 消息同步组件更新
+            document.querySelector('#message-sync-update').addEventListener('click', function() {
+                const button = this;
+                const originalText = button.innerHTML;
+                
+                button.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>更新中...';
+                button.className = 'btn-disabled px-3 py-2 rounded-xl text-sm font-medium';
+                button.disabled = true;
+                
+                setTimeout(() => {
+                    button.innerHTML = '<i class="fas fa-download mr-1"></i>更新';
+                    button.className = 'btn-primary px-3 py-2 rounded-xl text-sm font-medium';
+                    button.disabled = false;
+                    
+                    // 更新状态标签
+                    const statusBadge = button.closest('.component-card').querySelector('.status-badge');
+                    statusBadge.textContent = '已安装';
+                    statusBadge.className = 'status-badge status-installed';
+                    
+                    alert('消息同步组件更新完成');
+                }, 3000);
+            });
+
+            // 消息同步组件切换
+            document.querySelector('#message-sync-toggle').addEventListener('click', function() {
+                const isEnabled = this.textContent.includes('已启用');
+                
+                if (isEnabled) {
+                    this.textContent = '禁用';
+                    this.className = 'btn-danger px-3 py-2 rounded-xl text-sm font-medium';
+                    this.innerHTML = '<i class="fas fa-times mr-1"></i>禁用';
+                    alert('消息同步已禁用');
+                } else {
+                    this.textContent = '已启用';
+                    this.className = 'btn-success px-3 py-2 rounded-xl text-sm font-medium';
+                    this.innerHTML = '<i class="fas fa-check mr-1"></i>已启用';
+                    alert('消息同步已启用');
+                }
+            });
+
+            // 健康监测组件下载
+            document.querySelector('#health-download').addEventListener('click', function() {
+                const button = this;
+                const progressDiv = document.querySelector('#health-progress');
+                const progressBar = progressDiv.querySelector('.download-progress');
+                const progressText = progressDiv.querySelector('p');
+                
+                button.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>下载中...';
+                button.className = 'btn-disabled px-4 py-2 rounded-xl text-sm font-medium';
+                button.disabled = true;
+                progressDiv.classList.remove('hidden');
+                
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += Math.random() * 15 + 5;
+                    if (progress >= 100) {
+                        progress = 100;
+                        clearInterval(interval);
+                        
+                        setTimeout(() => {
+                            button.innerHTML = '<i class="fas fa-check mr-1"></i>已安装';
+                            button.className = 'btn-success px-4 py-2 rounded-xl text-sm font-medium';
+                            button.disabled = false;
+                            progressDiv.classList.add('hidden');
+                            
+                            // 更新状态标签
+                            const statusBadge = button.closest('.component-card').querySelector('.status-badge');
+                            statusBadge.textContent = '已安装';
+                            statusBadge.className = 'status-badge status-installed';
+                            
+                            // 更改按钮功能为启用/禁用
+                            button.id = 'health-toggle';
+                            button.addEventListener('click', function() {
+                                const isEnabled = this.textContent.includes('已启用');
+                                
+                                if (isEnabled) {
+                                    this.textContent = '禁用';
+                                    this.className = 'btn-danger px-4 py-2 rounded-xl text-sm font-medium';
+                                    this.innerHTML = '<i class="fas fa-times mr-1"></i>禁用';
+                                    alert('健康监测已禁用');
+                                } else {
+                                    this.textContent = '已启用';
+                                    this.className = 'btn-success px-4 py-2 rounded-xl text-sm font-medium';
+                                    this.innerHTML = '<i class="fas fa-check mr-1"></i>已启用';
+                                    alert('健康监测已启用');
+                                }
+                            });
+                            
+                            alert('健康监测组件下载完成');
+                        }, 500);
+                    }
+                    
+                    progressBar.style.width = progress + '%';
+                    progressText.textContent = `下载中: ${Math.round(progress)}%`;
+                }, 200);
+            });
+
+            // 音乐控制组件下载
+            document.querySelector('#music-download').addEventListener('click', function() {
+                const button = this;
+                const progressDiv = document.querySelector('#music-progress');
+                const progressBar = progressDiv.querySelector('.download-progress');
+                const progressText = progressDiv.querySelector('p');
+                
+                button.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>下载中...';
+                button.className = 'btn-disabled px-4 py-2 rounded-xl text-sm font-medium';
+                button.disabled = true;
+                progressDiv.classList.remove('hidden');
+                
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += Math.random() * 15 + 5;
+                    if (progress >= 100) {
+                        progress = 100;
+                        clearInterval(interval);
+                        
+                        setTimeout(() => {
+                            button.innerHTML = '<i class="fas fa-check mr-1"></i>已安装';
+                            button.className = 'btn-success px-4 py-2 rounded-xl text-sm font-medium';
+                            button.disabled = false;
+                            progressDiv.classList.add('hidden');
+                            
+                            // 更新状态标签
+                            const statusBadge = button.closest('.component-card').querySelector('.status-badge');
+                            statusBadge.textContent = '已安装';
+                            statusBadge.className = 'status-badge status-installed';
+                            
+                            // 更改按钮功能为启用/禁用
+                            button.id = 'music-toggle';
+                            button.addEventListener('click', function() {
+                                const isEnabled = this.textContent.includes('已启用');
+                                
+                                if (isEnabled) {
+                                    this.textContent = '禁用';
+                                    this.className = 'btn-danger px-4 py-2 rounded-xl text-sm font-medium';
+                                    this.innerHTML = '<i class="fas fa-times mr-1"></i>禁用';
+                                    alert('音乐控制已禁用');
+                                } else {
+                                    this.textContent = '已启用';
+                                    this.className = 'btn-success px-4 py-2 rounded-xl text-sm font-medium';
+                                    this.innerHTML = '<i class="fas fa-check mr-1"></i>已启用';
+                                    alert('音乐控制已启用');
+                                }
+                            });
+                            
+                            alert('音乐控制组件下载完成');
+                        }, 500);
+                    }
+                    
+                    progressBar.style.width = progress + '%';
+                    progressText.textContent = `下载中: ${Math.round(progress)}%`;
+                }, 200);
+            });
+
+            // 新闻资讯组件下载
+            document.querySelector('#news-download').addEventListener('click', function() {
+                const button = this;
+                const progressDiv = document.querySelector('#news-progress');
+                const progressBar = progressDiv.querySelector('.download-progress');
+                const progressText = progressDiv.querySelector('p');
+                
+                button.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>下载中...';
+                button.className = 'btn-disabled px-4 py-2 rounded-xl text-sm font-medium';
+                button.disabled = true;
+                progressDiv.classList.remove('hidden');
+                
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += Math.random() * 15 + 5;
+                    if (progress >= 100) {
+                        progress = 100;
+                        clearInterval(interval);
+                        
+                        setTimeout(() => {
+                            button.innerHTML = '<i class="fas fa-check mr-1"></i>已安装';
+                            button.className = 'btn-success px-4 py-2 rounded-xl text-sm font-medium';
+                            button.disabled = false;
+                            progressDiv.classList.add('hidden');
+                            
+                            // 更新状态标签
+                            const statusBadge = button.closest('.component-card').querySelector('.status-badge');
+                            statusBadge.textContent = '已安装';
+                            statusBadge.className = 'status-badge status-installed';
+                            
+                            // 更改按钮功能为启用/禁用
+                            button.id = 'news-toggle';
+                            button.addEventListener('click', function() {
+                                const isEnabled = this.textContent.includes('已启用');
+                                
+                                if (isEnabled) {
+                                    this.textContent = '禁用';
+                                    this.className = 'btn-danger px-4 py-2 rounded-xl text-sm font-medium';
+                                    this.innerHTML = '<i class="fas fa-times mr-1"></i>禁用';
+                                    alert('新闻资讯已禁用');
+                                } else {
+                                    this.textContent = '已启用';
+                                    this.className = 'btn-success px-4 py-2 rounded-xl text-sm font-medium';
+                                    this.innerHTML = '<i class="fas fa-check mr-1"></i>已启用';
+                                    alert('新闻资讯已启用');
+                                }
+                            });
+                            
+                            alert('新闻资讯组件下载完成');
+                        }, 500);
+                    }
+                    
+                    progressBar.style.width = progress + '%';
+                    progressText.textContent = `下载中: ${Math.round(progress)}%`;
+                }, 200);
+            });
+
+        });
+    </script>
+</body>
+</html>

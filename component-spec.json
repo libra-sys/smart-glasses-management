@@ -1,0 +1,217 @@
+{
+  "title": "智能眼镜组件开发规范",
+  "version": "1.0.0",
+  "description": "开发能在OpenAI智能眼镜上运行的组件",
+  
+  "componentStructure": {
+    "required": {
+      "id": {
+        "type": "string",
+        "description": "组件唯一标识，建议格式：author-name-001",
+        "example": "zhangsan-navigation-001"
+      },
+      "name": {
+        "type": "string",
+        "description": "组件名称",
+        "maxLength": 20,
+        "example": "AR导航助手"
+      },
+      "description": {
+        "type": "string",
+        "description": "组件描述",
+        "maxLength": 100,
+        "example": "实时AR导航，支持步行和驾车模式"
+      },
+      "version": {
+        "type": "string",
+        "description": "版本号，遵循语义化版本",
+        "pattern": "^\\d+\\.\\d+\\.\\d+$",
+        "example": "1.0.0"
+      },
+      "author": {
+        "type": "string",
+        "description": "作者名称",
+        "example": "张三"
+      },
+      "config": {
+        "type": "object",
+        "description": "组件配置，会通过蓝牙发送到ESP32",
+        "example": {
+          "updateInterval": 1000,
+          "displayMode": "ar",
+          "voiceEnabled": true,
+          "brightness": 80
+        }
+      }
+    },
+    "optional": {
+      "icon": {
+        "type": "string",
+        "description": "组件图标（emoji）",
+        "example": "🗺️"
+      },
+      "color": {
+        "type": "string",
+        "description": "主题色（HEX格式）",
+        "pattern": "^#[0-9A-Fa-f]{6}$",
+        "example": "#34C759"
+      },
+      "category": {
+        "type": "string",
+        "description": "组件分类",
+        "enum": ["导航", "健康", "翻译", "拍照", "工具", "娱乐"],
+        "example": "导航"
+      },
+      "tags": {
+        "type": "array",
+        "description": "标签",
+        "example": ["AR", "导航", "实时"]
+      },
+      "espCode": {
+        "type": "string",
+        "description": "ESP32代码（C++）",
+        "example": "void setup() { Serial.begin(115200); }"
+      }
+    }
+  },
+
+  "componentTypes": [
+    {
+      "type": "display",
+      "name": "显示类组件",
+      "description": "在眼镜屏幕上显示信息",
+      "examples": ["天气预报", "通知提醒", "时间显示"],
+      "requiredConfig": ["displayMode", "updateInterval"]
+    },
+    {
+      "type": "sensor",
+      "name": "传感器类组件",
+      "description": "读取硬件传感器数据",
+      "examples": ["心率监测", "步数统计", "环境光检测"],
+      "requiredConfig": ["sensorType", "sampleRate"]
+    },
+    {
+      "type": "interaction",
+      "name": "交互类组件",
+      "description": "与用户交互",
+      "examples": ["语音助手", "手势控制", "按键交互"],
+      "requiredConfig": ["interactionMode"]
+    },
+    {
+      "type": "network",
+      "name": "网络类组件",
+      "description": "需要网络连接",
+      "examples": ["AI问答", "实时翻译", "在线导航"],
+      "requiredConfig": ["apiEndpoint", "timeout"]
+    }
+  ],
+
+  "bluetoothProtocol": {
+    "description": "小程序与ESP32眼镜的蓝牙通信协议",
+    "format": "JSON",
+    "commands": {
+      "COMPONENT_INSTALL": {
+        "description": "安装组件",
+        "data": {
+          "type": "COMPONENT_INSTALL",
+          "componentId": "组件ID",
+          "componentName": "组件名称",
+          "config": {},
+          "enabled": true,
+          "timestamp": 1234567890
+        }
+      },
+      "COMPONENT_UNINSTALL": {
+        "description": "卸载组件",
+        "data": {
+          "type": "COMPONENT_UNINSTALL",
+          "componentId": "组件ID",
+          "timestamp": 1234567890
+        }
+      },
+      "COMPONENT_UPDATE": {
+        "description": "更新组件配置",
+        "data": {
+          "type": "COMPONENT_UPDATE",
+          "componentId": "组件ID",
+          "config": {},
+          "timestamp": 1234567890
+        }
+      }
+    }
+  },
+
+  "esp32CodeTemplate": {
+    "description": "ESP32组件代码模板（C++）",
+    "template": "#include <Arduino.h>\n#include <ArduinoJson.h>\n\n// 组件全局变量\nJsonDocument componentConfig;\nbool componentEnabled = false;\n\n// 组件初始化\nvoid componentSetup() {\n  Serial.println(\"组件初始化\");\n  // TODO: 添加初始化代码\n}\n\n// 组件主循环\nvoid componentLoop() {\n  if (!componentEnabled) return;\n  \n  // TODO: 添加主循环代码\n}\n\n// 处理蓝牙指令\nvoid onBluetoothCommand(JsonDocument& cmd) {\n  String type = cmd[\"type\"];\n  \n  if (type == \"COMPONENT_INSTALL\") {\n    componentConfig = cmd[\"config\"];\n    componentEnabled = cmd[\"enabled\"];\n    componentSetup();\n  }\n  else if (type == \"COMPONENT_UNINSTALL\") {\n    componentEnabled = false;\n  }\n  else if (type == \"COMPONENT_UPDATE\") {\n    componentConfig = cmd[\"config\"];\n  }\n}\n\n// 主程序集成\nvoid setup() {\n  Serial.begin(115200);\n  // 初始化蓝牙\n}\n\nvoid loop() {\n  componentLoop();\n  delay(10);\n}"
+  },
+
+  "exampleComponents": [
+    {
+      "name": "简单时间显示",
+      "id": "example-clock-001",
+      "description": "在眼镜上显示当前时间",
+      "config": {
+        "format": "24h",
+        "updateInterval": 1000,
+        "fontSize": 16
+      },
+      "espCode": "void componentLoop() {\n  if (millis() % 1000 == 0) {\n    char timeStr[9];\n    sprintf(timeStr, \"%02d:%02d:%02d\", hour(), minute(), second());\n    displayText(timeStr);\n  }\n}"
+    },
+    {
+      "name": "心率监测",
+      "id": "example-heartrate-001",
+      "description": "读取心率传感器数据",
+      "config": {
+        "sensorPin": 34,
+        "sampleRate": 100,
+        "threshold": 60
+      },
+      "espCode": "void componentLoop() {\n  int sensorValue = analogRead(config[\"sensorPin\"]);\n  int heartRate = calculateHeartRate(sensorValue);\n  if (heartRate > config[\"threshold\"]) {\n    displayValue(heartRate);\n  }\n}"
+    }
+  ],
+
+  "uploadApi": {
+    "endpoint": "POST /api/components",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "name": "组件名称",
+      "description": "组件描述",
+      "icon": "🔧",
+      "color": "#007AFF",
+      "category": "工具",
+      "tags": ["实用"],
+      "config": {},
+      "espCode": "// ESP32代码",
+      "version": "1.0.0"
+    },
+    "response": {
+      "success": true,
+      "data": {
+        "id": "auto-generated-id",
+        "message": "组件发布成功"
+      }
+    }
+  },
+
+  "bestPractices": [
+    "组件ID使用小写字母、数字和连字符",
+    "config中的配置项使用驼峰命名",
+    "ESP32代码要处理错误情况",
+    "组件要支持启用/禁用状态",
+    "定期释放内存，避免内存泄漏",
+    "使用Serial.println输出调试信息",
+    "敏感操作要添加超时机制",
+    "网络请求要有重试机制"
+  ],
+
+  "limitations": [
+    "ESP32内存有限，单个组件代码不超过50KB",
+    "避免使用大量全局变量",
+    "蓝牙传输数据包不超过512字节",
+    "组件主循环不要使用阻塞式delay",
+    "同时运行的组件不超过10个"
+  ]
+}

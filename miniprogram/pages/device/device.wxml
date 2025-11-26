@@ -1,0 +1,89 @@
+<!--device.wxml-->
+<!-- 设备管理页 -->
+<view class="container">
+  <!-- 顶部导航栏 -->
+  <view class="top-header">
+    <view class="header-content">
+      <text class="page-title">设备管理</text>
+      <button class="search-btn" bindtap="startSearch">🔍</button>
+       <button class="settings-btn" bindtap="onSettingsTap">⚙️</button>
+    </view>
+  </view>
+
+  <!-- 主内容区域 -->
+  <view class="main-content">
+    <!-- 已绑定设备 -->
+    <view class="bound-device-section">
+      <text class="section-title">已绑定设备</text>
+      
+      <view wx:if="{{boundDevices.length > 0}}" class="device-list">
+        <view 
+          wx:for="{{boundDevices}}" 
+          wx:key="deviceId"
+          class="device-card"
+          bindtap="connectBoundDevice"
+          data-device="{{item}}">
+          <view class="device-info">
+            <text class="device-name">{{item.deviceName}}</text>
+            <text class="device-model">{{item.model}} {{item.serial}}</text>
+            <text class="device-status">已绑定</text>
+          </view>
+          <button class="unbind-btn" bindtap="unbindDevice" data-index="{{index}}">解除绑定</button>
+        <view wx:if="{{connectedDevice && connectedDevice.deviceId === item.deviceId}}" class="device-controls">
+          <button class="ai-toggle-btn" bindtap="toggleAiMode">{{aiModeEnabled ? 'AI增强已开启' : '开启AI增强'}}</button>
+        </view>
+        </view>
+      </view>
+      
+      <view wx:else class="no-device-section">
+        <text class="icon">🔗</text>
+        <text class="text">暂无已绑定设备</text>
+        <button class="add-btn" bindtap="startSearch">添加设备</button>
+      </view>
+    </view>
+
+    <!-- 搜索结果 -->
+    <view wx:if="{{searching || devices.length > 0}}" class="search-results-section">
+      <text class="section-title">搜索到的设备</text>
+      <text class="search-status">{{searching ? '搜索中...' : '搜索完成'}}</text>
+      
+      <view class="device-list">
+        <view 
+          wx:for="{{devices}}" 
+          wx:key="deviceId"
+          class="device-item"
+          bindtap="connectDevice"
+          bindlongpress="editDeviceName"
+          data-device="{{item}}">
+          <view class="device-item-info">
+            <view class="device-name-row">
+              <text class="device-item-name">{{item.name}}</text>
+              <text wx:if="{{item.hasCustomName}}" class="custom-tag">自定义</text>
+              <text wx:elif="{{item.hasSystemName}}" class="system-tag">系统</text>
+            </view>
+            <text class="device-item-model">{{item.model}} | 信号: {{item.rssi}}dBm</text>
+            <text wx:if="{{item.systemName}}" class="device-system-name">
+              系统名: {{item.systemName}}
+            </text>
+            <text wx:if="{{item.advertisName}}" class="device-original-name">
+              广播名: {{item.advertisName}}
+            </text>
+          </view>
+          <view class="device-actions">
+            <button class="connect-btn" catchtap="connectDevice" data-device="{{item}}">连接</button>
+          </view>
+        </view>
+      </view>
+      <view class="tip-text">
+        <text>提示：长按设备可自定义名称</text>
+      </view>
+    </view>
+
+    <!-- 未搜索状态 -->
+    <view wx:if="{{!searching && devices.length === 0 && boundDevices.length === 0}}" class="no-device-section">
+      <text class="icon">👓</text>
+      <text class="text">请搜索并添加您的智能眼镜设备</text>
+      <button class="search-btn" bindtap="startSearch">搜索设备</button>
+    </view>
+  </view>
+</view>

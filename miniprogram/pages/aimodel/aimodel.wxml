@@ -1,0 +1,92 @@
+<view class="container">
+  <!-- 顶部导航栏 -->
+  <view class="header">
+    <text class="page-title">AI模型管理</text>
+  </view>
+
+  <!-- 当前使用的模型 -->
+  <view class="section">
+    <text class="section-title">当前模型</text>
+    <view wx:for="{{models}}" wx:key="id" class="model-item {{selectedModel === item.id ? 'selected' : ''}}">
+      <view class="model-icon" style="background-color: {{item.color}};">
+        <text class="icon-emoji">{{item.icon}}</text>
+      </view>
+      <view class="model-info">
+        <view class="model-header">
+          <text class="model-name">{{item.name}}</text>
+          <text class="model-provider">{{item.provider}}</text>
+        </view>
+        <text class="model-desc">{{item.description}}</text>
+        <view wx:if="item.configured" class="model-status">
+          <text class="status-badge configured">已配置</text>
+          <text class="status-badge {{item.enabled ? 'enabled' : 'disabled'}}">
+            {{item.enabled ? '已启用' : '已禁用'}}
+          </text>
+        </view>
+        <text wx:else class="model-status-text unconfigured">未配置</text>
+      </view>
+      <view class="model-actions">
+        <button 
+          class="config-btn"
+          bindtap="configureModel"
+          data-index="{{index}}"
+        >
+          {{item.configured ? '重新配置' : '配置'}}
+        </button>
+        <switch 
+          wx:if="{{item.configured}}"
+          checked="{{item.enabled}}" 
+          bindchange="toggleModel"
+          data-index="{{index}}"
+          class="model-switch"
+        />
+        <button 
+          wx:if="{{item.configured && item.enabled}}"
+          class="select-btn {{selectedModel === item.id ? 'selected' : ''}}"
+          bindtap="selectModel"
+          data-id="{{item.id}}"
+        >
+          {{selectedModel === item.id ? '使用中' : '切换'}}
+        </button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 配置弹窗 -->
+  <view wx:if="{{showConfigModal}}" class="modal-mask" catchtap="closeConfigModal">
+    <view class="modal-content" catchtap="stopPropagation">
+      <view class="modal-header">
+        <text class="modal-title">配置 {{currentConfigModel.name}}</text>
+        <text class="modal-close" bindtap="closeConfigModal">×</text>
+      </view>
+      
+      <view class="modal-body">
+        <view class="form-item">
+          <text class="form-label">服务商</text>
+          <text class="form-value">{{currentConfigModel.provider}}</text>
+        </view>
+        
+        <view class="form-item">
+          <text class="form-label">API Key</text>
+          <input 
+            class="form-input"
+            type="text"
+            password
+            placeholder="请输入API Key"
+            value="{{currentConfigModel.apiKey}}"
+            bindinput="inputApiKey"
+          />
+        </view>
+        
+        <view class="form-tips">
+          <text class="tips-text">💡 请在{{currentConfigModel.provider}}官网获取API Key</text>
+        </view>
+      </view>
+      
+      <view class="modal-footer">
+        <button class="test-btn" bindtap="testConnection">测试连接</button>
+        <button class="save-btn" bindtap="saveConfig">保存</button>
+      </view>
+    </view>
+  </view>
+</view>

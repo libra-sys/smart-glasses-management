@@ -1,0 +1,123 @@
+<!--index.wxml-->
+<!-- 首页 - 全新设计 -->
+<view class="container">
+  <!-- 顶部导航栏 -->
+  <view class="top-header">
+    <view class="header-content">
+      <view class="user-info" bindtap="handleUserClick">
+        <view class="user-avatar-wrapper">
+          <text class="user-avatar-text">{{userInfo.username ? userInfo.username.substring(0,1) : '游'}}</text>
+        </view>
+        <view class="user-text">
+          <text class="greeting">{{greetingTime}}</text>
+          <text class="username">{{userInfo.username || '游客'}}</text>
+        </view>
+      </view>
+      <view class="header-buttons">
+        <button class="icon-btn settings-btn" bindtap="deviceSettings">
+          <text class="icon-text">⚙</text>
+        </button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 主内容区域 -->
+  <view class="main-content">
+    <!-- 设备状态卡片 -->
+    <view wx:if="{{connectedDevice}}" class="device-card">
+      <view class="device-header">
+        <view class="device-info">
+          <text class="device-name">{{connectedDevice.deviceName || '智能眼镜 Pro'}}</text>
+          <text class="device-model">型号: {{connectedDevice.model || '未知'}}</text>
+        </view>
+        <view class="connection-status">
+          <view class="status-indicator {{isConnecting ? 'connecting' : 'connected'}}"></view>
+          <text class="status-text">{{isConnecting ? '连接中...' : '已连接'}}</text>
+        </view>
+      </view>
+      
+      <view class="device-status">
+        <view class="status-card battery-card">
+          <view class="status-header">
+            <text class="status-icon">🔋</text>
+            <text class="status-value">{{deviceBattery || 85}}%</text>
+          </view>
+          <view class="battery-bar-container">
+            <view class="battery-bar" style="width: {{deviceBattery || 85}}%"></view>
+          </view>
+          <text class="status-label">{{deviceBattery >= 80 ? '电量充足' : deviceBattery >= 20 ? '电量正常' : '电量较低'}}</text>
+        </view>
+        
+        <view class="status-card mode-card">
+          <view class="status-header">
+            <text class="status-icon">✨</text>
+            <text class="status-value">AI模式</text>
+          </view>
+          <text class="status-detail">GPT-4</text>
+          <text class="status-label">{{aiModeEnabled ? '已启用' : '运行正常'}}</text>
+        </view>
+      </view>
+      
+      <view class="control-buttons">
+        <button class="control-btn power-btn" bindtap="shutdownDevice">
+          <text class="btn-icon">⏻</text>
+          <text class="btn-text">断开连接</text>
+        </button>
+        <button class="control-btn ai-btn {{aiModeEnabled ? 'active' : ''}}" bindtap="toggleAiMode">
+          <text class="btn-icon">🧠</text>
+          <text class="btn-text">{{aiModeEnabled ? 'AI增强' : '开启AI'}}</text>
+        </button>
+      </view>
+    </view>
+
+    <!-- 无设备连接状态 -->
+    <view wx:else class="no-device-section">
+      <text class="no-device-icon">🔍</text>
+      <text class="no-device-title">暂无设备连接</text>
+      <text class="no-device-subtitle">请添加您的智能眼镜设备</text>
+      <button class="add-device-from-empty" bindtap="addDevice">
+        <text class="btn-icon">+</text>
+        <text class="btn-text">添加设备</text>
+      </button>
+    </view>
+
+    <!-- 快速功能入口 -->
+    <view class="quick-actions">
+      <text class="section-title">快速设置</text>
+      
+      <view class="action-grid">
+        <view class="action-item" bindtap="switchAIModel">
+          <view class="action-icon-wrapper primary-bg">
+            <text class="action-icon">🧠</text>
+          </view>
+          <text class="action-name">AI模型</text>
+          <text class="action-desc">管理智能模型</text>
+        </view>
+        
+        <view class="action-item" bindtap="soundSettings">
+          <view class="action-icon-wrapper secondary-bg">
+            <text class="action-icon">🎵</text>
+          </view>
+          <text class="action-name">音效设置</text>
+          <text class="action-desc">自定义音效</text>
+        </view>
+        
+        <view class="action-item" bindtap="extensionFunctions">
+          <view class="action-icon-wrapper warning-bg">
+            <text class="action-icon">🧩</text>
+          </view>
+          <text class="action-name">功能组件</text>
+          <text class="action-desc">扩展功能</text>
+        </view>
+        
+        <view class="action-item" bindtap="volumeControl">
+          <view class="action-icon-wrapper info-bg">
+            <text class="action-icon">🔊</text>
+          </view>
+          <text class="action-name">音量控制</text>
+          <text class="action-desc">调节音量</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

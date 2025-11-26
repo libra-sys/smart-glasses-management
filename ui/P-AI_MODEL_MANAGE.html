@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI模型管理 - 镜控智联</title>
+    <script src="https://unpkg.byted-static.com/coze/space_ppt_lib/1.0.3-alpha.12/lib/tailwindcss.js"></script>
+    <script src="https://unpkg.byted-static.com/fortawesome/fontawesome-free/6.7.2/js/all.min.js" data-auto-replace-svg="nest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#007AFF',
+                        secondary: '#5856D6',
+                        success: '#34C759',
+                        danger: '#FF3B30',
+                        warning: '#FF9500',
+                        info: '#5AC8FA',
+                        background: '#F2F2F7',
+                        surface: '#FFFFFF',
+                        'text-primary': '#000000',
+                        'text-secondary': '#8E8E93',
+                        'text-tertiary': '#C7C7CC',
+                        'border-light': '#E5E5EA'
+                    },
+                    fontFamily: {
+                        'sf': ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Helvetica Neue', 'Arial', 'sans-serif']
+                    },
+                    boxShadow: {
+                        'card': '0 2px 10px rgba(0, 0, 0, 0.08)',
+                        'button': '0 2px 8px rgba(0, 122, 255, 0.2)'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .model-card-active {
+            border-color: #007AFF;
+            background: linear-gradient(135deg, rgba(0, 122, 255, 0.05) 0%, rgba(88, 86, 214, 0.05) 100%);
+        }
+        
+        .progress-bar {
+            transition: width 0.3s ease;
+        }
+        
+        .btn-loading {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        
+        .status-badge {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        
+        .status-installed {
+            background-color: #34C759;
+            color: white;
+        }
+        
+        .status-updatable {
+            background-color: #FF9500;
+            color: white;
+        }
+        
+        .status-available {
+            background-color: #8E8E93;
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-background font-sf">
+    <!-- iOS 状态栏 -->
+    <div id="status-bar" class="fixed top-0 left-0 right-0 h-11 bg-surface flex items-center justify-between px-6 text-sm font-medium text-text-primary z-50">
+        <div class="flex items-center space-x-1">
+            <span>9:41</span>
+        </div>
+        <div class="flex items-center space-x-1">
+            <i class="fas fa-signal text-xs"></i>
+            <i class="fas fa-wifi text-xs"></i>
+            <div class="w-6 h-3 border border-text-primary rounded-sm">
+                <div class="w-4 h-1.5 bg-text-primary rounded-sm m-0.5"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主容器 -->
+    <div id="main-container" class="max-w-sm mx-auto bg-surface min-h-screen relative" style="margin-top: 44px;">
+        
+        <!-- 顶部导航栏 -->
+        <header id="top-header" class="bg-surface px-6 py-4 border-b border-border-light">
+            <div id="header-content" class="flex items-center">
+                <button id="back-btn" class="w-10 h-10 rounded-full bg-background flex items-center justify-center mr-4">
+                    <i class="fas fa-chevron-left text-primary text-lg"></i>
+                </button>
+                <h1 id="page-title" class="text-xl font-semibold text-text-primary">AI模型管理</h1>
+            </div>
+        </header>
+
+        <!-- 主内容区域 -->
+        <main id="main-content" class="px-6 py-6">
+            
+            <!-- 当前活跃模型提示 -->
+            <div id="active-model-banner" class="bg-primary/10 border border-primary/20 rounded-2xl p-4 mb-6">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <i class="fas fa-brain text-primary text-xl"></i>
+                        <div>
+                            <h3 class="font-semibold text-text-primary">当前活跃模型</h3>
+                            <p id="current-model-name" class="text-sm text-text-secondary">GPT-4 Turbo</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-xs text-text-secondary">版本</p>
+                        <p id="current-model-version" class="text-sm font-medium text-text-primary">v1.2.3</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI模型列表 -->
+            <section id="ai-models-section">
+                <h2 id="models-title" class="text-lg font-semibold text-text-primary mb-4">可用模型</h2>
+                
+                <div id="models-list" class="space-y-4">
+                    
+                    <!-- GPT-4 Turbo 模型（当前活跃） -->
+                    <div id="model-gpt4-turbo" class="bg-surface rounded-2xl p-4 shadow-card border border-border-light model-card-active">
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="flex-1">
+                                <div class="flex items-center space-x-2 mb-1">
+                                    <h3 class="font-semibold text-text-primary">GPT-4 Turbo</h3>
+                                    <span class="status-badge status-installed">已安装</span>
+                                    <span class="bg-primary text-white text-xs px-2 py-1 rounded-full">当前</span>
+                                </div>
+                                <p class="text-sm text-text-secondary mb-2">强大的多模态AI模型，支持文本和图像理解</p>
+                                <div class="flex items-center space-x-4 text-xs text-text-secondary">
+                                    <span>版本: v1.2.3</span>
+                                    <span>大小: 4.2GB</span>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <button id="switch-gpt4-turbo" class="px-4 py-2 bg-primary text-white rounded-xl text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                                    当前使用
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Claude 3 Opus 模型 -->
+                    <div id="model-claude-opus" class="bg-surface rounded-2xl p-4 shadow-card border border-border-light">
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="flex-1">
+                                <div class="flex items-center space-x-2 mb-1">
+                                    <h3 class="font-semibold text-text-primary">Claude 3 Opus</h3>
+                                    <span class="status-badge status-installed">已安装</span>
+                                </div>
+                                <p class="text-sm text-text-secondary mb-2">Anthropic最新AI模型，擅长复杂推理任务</p>
+                                <div class="flex items-center space-x-4 text-xs text-text-secondary">
+                                    <span>版本: v3.1.0</span>
+                                    <span>大小: 3.8GB</span>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <button id="switch-claude-opus" class="px-4 py-2 bg-primary text-white rounded-xl text-sm font-medium hover:bg-primary/90 transition-colors">
+                                    切换
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gemini Ultra 模型（可更新） -->
+                    <div id="model-gemini-ultra" class="bg-surface rounded-2xl p-4 shadow-card border border-border-light">
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="flex-1">
+                                <div class="flex items-center space-x-2 mb-1">
+                                    <h3 class="font-semibold text-text-primary">Gemini Ultra</h3>
+                                    <span class="status-badge status-updatable">可更新</span>
+                                </div>
+                                <p class="text-sm text-text-secondary mb-2">Google AI模型，在数学和编程方面表现出色</p>
+                                <div class="flex items-center space-x-4 text-xs text-text-secondary mb-2">
+                                    <span>当前: v1.5.0</span>
+                                    <span>最新: v1.5.2</span>
+                                    <span>大小: 5.1GB</span>
+                                </div>
+                                <!-- 更新进度条 -->
+                                <div id="update-progress-gemini" class="hidden">
+                                    <div class="w-full bg-background rounded-full h-2 mb-1">
+                                        <div class="progress-bar bg-primary h-2 rounded-full" style="width: 0%"></div>
+                                    </div>
+                                    <p class="text-xs text-text-secondary">正在更新...</p>
+                                </div>
+                            </div>
+                            <div class="ml-4 space-y-2">
+                                <button id="update-gemini-ultra" class="px-4 py-2 bg-warning text-white rounded-xl text-sm font-medium hover:bg-warning/90 transition-colors">
+                                    更新
+                                </button>
+                                <button id="switch-gemini-ultra" class="px-4 py-2 bg-background text-primary rounded-xl text-sm font-medium hover:bg-background/80 transition-colors">
+                                    切换
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Llama 3 模型（可下载） -->
+                    <div id="model-llama3" class="bg-surface rounded-2xl p-4 shadow-card border border-border-light">
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="flex-1">
+                                <div class="flex items-center space-x-2 mb-1">
+                                    <h3 class="font-semibold text-text-primary">Llama 3 70B</h3>
+                                    <span class="status-badge status-available">可下载</span>
+                                </div>
+                                <p class="text-sm text-text-secondary mb-2">Meta开源大模型，适合本地部署使用</p>
+                                <div class="flex items-center space-x-4 text-xs text-text-secondary mb-2">
+                                    <span>版本: v3.0.0</span>
+                                    <span>大小: 28.7GB</span>
+                                </div>
+                                <!-- 下载进度条 -->
+                                <div id="download-progress-llama" class="hidden">
+                                    <div class="w-full bg-background rounded-full h-2 mb-1">
+                                        <div class="progress-bar bg-primary h-2 rounded-full" style="width: 0%"></div>
+                                    </div>
+                                    <p class="text-xs text-text-secondary">正在下载...</p>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <button id="download-llama3" class="px-4 py-2 bg-primary text-white rounded-xl text-sm font-medium hover:bg-primary/90 transition-colors">
+                                    下载
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mistral AI 模型（可下载） -->
+                    <div id="model-mistral" class="bg-surface rounded-2xl p-4 shadow-card border border-border-light">
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="flex-1">
+                                <div class="flex items-center space-x-2 mb-1">
+                                    <h3 class="font-semibold text-text-primary">Mistral AI</h3>
+                                    <span class="status-badge status-available">可下载</span>
+                                </div>
+                                <p class="text-sm text-text-secondary mb-2">高效轻量的AI模型，响应速度快</p>
+                                <div class="flex items-center space-x-4 text-xs text-text-secondary mb-2">
+                                    <span>版本: v0.2.0</span>
+                                    <span>大小: 12.5GB</span>
+                                </div>
+                                <!-- 下载进度条 -->
+                                <div id="download-progress-mistral" class="hidden">
+                                    <div class="w-full bg-background rounded-full h-2 mb-1">
+                                        <div class="progress-bar bg-primary h-2 rounded-full" style="width: 0%"></div>
+                                    </div>
+                                    <p class="text-xs text-text-secondary">正在下载...</p>
+                                </div>
+                            </div>
+                            <div class="ml-4">
+                                <button id="download-mistral" class="px-4 py-2 bg-primary text-white rounded-xl text-sm font-medium hover:bg-primary/90 transition-colors">
+                                    下载
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+        </main>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // 获取URL参数的辅助函数
+            function getUrlParams() {
+                const params = {};
+                const queryString = window.location.search.substring(1);
+                const urlParams = new URLSearchParams(queryString);
+                
+                for(const [key, value] of urlParams.entries()) {
+                    params[key] = value;
+                }
+                return params;
+            }
+
+            // 获取设备ID参数
+            const params = getUrlParams();
+            const deviceId = params.deviceId || 'default-device';
+
+            // 返回按钮点击事件
+            document.querySelector('#back-btn').addEventListener('click', function() {
+                window.location.href = `P-DEVICE_DETAIL.html?deviceId=${deviceId}`;
+            });
+
+            // 模拟AI模型数据
+            const aiModels = {
+                'gpt4-turbo': {
+                    name: 'GPT-4 Turbo',
+                    version: 'v1.2.3',
+                    size: '4.2GB',
+                    description: '强大的多模态AI模型，支持文本和图像理解',
+                    status: 'installed',
+                    isActive: true
+                },
+                'claude-opus': {
+                    name: 'Claude 3 Opus',
+                    version: 'v3.1.0',
+                    size: '3.8GB',
+                    description: 'Anthropic最新AI模型，擅长复杂推理任务',
+                    status: 'installed',
+                    isActive: false
+                },
+                'gemini-ultra': {
+                    name: 'Gemini Ultra',
+                    version: 'v1.5.0',
+                    latestVersion: 'v1.5.2',
+                    size: '5.1GB',
+                    description: 'Google AI模型，在数学和编程方面表现出色',
+                    status: 'updatable',
+                    isActive: false
+                },
+                'llama3': {
+                    name: 'Llama 3 70B',
+                    version: 'v3.0.0',
+                    size: '28.7GB',
+                    description: 'Meta开源大模型，适合本地部署使用',
+                    status: 'available',
+                    isActive: false
+                },
+                'mistral': {
+                    name: 'Mistral AI',
+                    version: 'v0.2.0',
+                    size: '12.5GB',
+                    description: '高效轻量的AI模型，响应速度快',
+                    status: 'available',
+                    isActive: false
+                }
+            };
+
+            // 切换模型功能
+            function switchModel(modelId) {
+                const model = aiModels[modelId];
+                if (!model || model.isActive) return;
+
+                // 移除当前活跃模型的标识
+                Object.keys(aiModels).forEach(id => {
+                    aiModels[id].isActive = false;
+                    const card = document.querySelector(`#model-${id}`);
+                    const switchBtn = document.querySelector(`#switch-${id}`);
+                    
+                    if (card) {
+                        card.classList.remove('model-card-active');
+                    }
+                    if (switchBtn) {
+                        switchBtn.disabled = false;
+                        switchBtn.textContent = '切换';
+                        switchBtn.className = 'px-4 py-2 bg-primary text-white rounded-xl text-sm font-medium hover:bg-primary/90 transition-colors';
+                    }
+                });
+
+                // 设置新的活跃模型
+                model.isActive = true;
+                const newActiveCard = document.querySelector(`#model-${modelId}`);
+                const newActiveBtn = document.querySelector(`#switch-${modelId}`);
+                
+                if (newActiveCard) {
+                    newActiveCard.classList.add('model-card-active');
+                }
+                if (newActiveBtn) {
+                    newActiveBtn.disabled = true;
+                    newActiveBtn.textContent = '当前使用';
+                    newActiveBtn.className = 'px-4 py-2 bg-primary text-white rounded-xl text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed';
+                }
+
+                // 更新顶部活跃模型显示
+                document.querySelector('#current-model-name').textContent = model.name;
+                document.querySelector('#current-model-version').textContent = model.version;
+
+                // 显示成功提示
+                alert(`已切换到 ${model.name}`);
+            }
+
+            // 下载模型功能
+            function downloadModel(modelId) {
+                const model = aiModels[modelId];
+                if (!model || model.status !== 'available') return;
+
+                const downloadBtn = document.querySelector(`#download-${modelId}`);
+                const progressDiv = document.querySelector(`#download-progress-${modelId.split('-')[0]}`);
+                const progressBar = progressDiv ? progressDiv.querySelector('.progress-bar') : null;
+
+                if (!downloadBtn || !progressDiv || !progressBar) return;
+
+                // 开始下载
+                downloadBtn.disabled = true;
+                downloadBtn.className = 'px-4 py-2 bg-background text-text-secondary rounded-xl text-sm font-medium btn-loading';
+                downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>下载中';
+                progressDiv.classList.remove('hidden');
+
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += Math.random() * 15;
+                    if (progress >= 100) {
+                        progress = 100;
+                        clearInterval(interval);
+                        
+                        // 下载完成
+                        setTimeout(() => {
+                            model.status = 'installed';
+                            downloadBtn.disabled = false;
+                            downloadBtn.textContent = '切换';
+                            downloadBtn.className = 'px-4 py-2 bg-primary text-white rounded-xl text-sm font-medium hover:bg-primary/90 transition-colors';
+                            downloadBtn.id = `switch-${modelId}`;
+                            progressDiv.classList.add('hidden');
+                            
+                            // 更新状态标签
+                            const statusBadge = document.querySelector(`#model-${modelId} .status-badge`);
+                            if (statusBadge) {
+                                statusBadge.textContent = '已安装';
+                                statusBadge.className = 'status-badge status-installed';
+                            }
+
+                            // 添加切换事件
+                            downloadBtn.addEventListener('click', function() {
+                                switchModel(modelId);
+                            });
+
+                            alert(`${model.name} 下载完成`);
+                        }, 500);
+                    }
+                    progressBar.style.width = progress + '%';
+                }, 300);
+            }
+
+            // 更新模型功能
+            function updateModel(modelId) {
+                const model = aiModels[modelId];
+                if (!model || model.status !== 'updatable') return;
+
+                const updateBtn = document.querySelector(`#update-${modelId}`);
+                const progressDiv = document.querySelector(`#update-progress-${modelId.split('-')[0]}`);
+                const progressBar = progressDiv ? progressDiv.querySelector('.progress-bar') : null;
+
+                if (!updateBtn || !progressDiv || !progressBar) return;
+
+                // 开始更新
+                updateBtn.disabled = true;
+                updateBtn.className = 'px-4 py-2 bg-background text-text-secondary rounded-xl text-sm font-medium btn-loading';
+                updateBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i>更新中';
+                progressDiv.classList.remove('hidden');
+
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += Math.random() * 20;
+                    if (progress >= 100) {
+                        progress = 100;
+                        clearInterval(interval);
+                        
+                        // 更新完成
+                        setTimeout(() => {
+                            model.status = 'installed';
+                            model.version = model.latestVersion;
+                            delete model.latestVersion;
+                            
+                            updateBtn.style.display = 'none';
+                            progressDiv.classList.add('hidden');
+                            
+                            // 更新状态标签和版本信息
+                            const statusBadge = document.querySelector(`#model-${modelId} .status-badge`);
+                            const versionInfo = document.querySelector(`#model-${modelId} .text-xs.text-text-secondary`);
+                            if (statusBadge) {
+                                statusBadge.textContent = '已安装';
+                                statusBadge.className = 'status-badge status-installed';
+                            }
+                            if (versionInfo) {
+                                versionInfo.innerHTML = `<span>版本: ${model.version}</span><span class="ml-4">大小: ${model.size}</span>`;
+                            }
+
+                            alert(`${model.name} 更新完成`);
+                        }, 500);
+                    }
+                    progressBar.style.width = progress + '%';
+                }, 200);
+            }
+
+            // 绑定事件监听器
+            document.querySelector('#switch-claude-opus').addEventListener('click', function() {
+                switchModel('claude-opus');
+            });
+
+            document.querySelector('#switch-gemini-ultra').addEventListener('click', function() {
+                switchModel('gemini-ultra');
+            });
+
+            document.querySelector('#download-llama3').addEventListener('click', function() {
+                downloadModel('llama3');
+            });
+
+            document.querySelector('#download-mistral').addEventListener('click', function() {
+                downloadModel('mistral');
+            });
+
+            document.querySelector('#update-gemini-ultra').addEventListener('click', function() {
+                updateModel('gemini-ultra');
+            });
+
+            // 页面加载时初始化
+            console.log('AI模型管理页面加载完成，设备ID:', deviceId);
+        });
+    </script>
+</body>
+</html>

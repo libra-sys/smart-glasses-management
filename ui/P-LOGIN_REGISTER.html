@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>镜控智联 - 登录注册</title>
+    <script src="https://unpkg.byted-static.com/coze/space_ppt_lib/1.0.3-alpha.12/lib/tailwindcss.js"></script>
+    <script src="https://unpkg.byted-static.com/fortawesome/fontawesome-free/6.7.2/js/all.min.js" data-auto-replace-svg="nest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#007AFF',
+                        secondary: '#5856D6',
+                        success: '#34C759',
+                        danger: '#FF3B30',
+                        warning: '#FF9500',
+                        info: '#5AC8FA',
+                        background: '#F2F2F7',
+                        surface: '#FFFFFF',
+                        'text-primary': '#000000',
+                        'text-secondary': '#8E8E93',
+                        'text-tertiary': '#C7C7CC',
+                        'border-light': '#E5E5EA'
+                    },
+                    fontFamily: {
+                        'sf': ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Helvetica Neue', 'Arial', 'sans-serif']
+                    },
+                    boxShadow: {
+                        'card': '0 2px 10px rgba(0, 0, 0, 0.08)',
+                        'button': '0 2px 8px rgba(0, 122, 255, 0.2)'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .form-input-focus:focus {
+            outline: none;
+            border-color: #007AFF;
+            box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.2);
+        }
+        
+        .tab-active {
+            color: #007AFF;
+            border-bottom: 2px solid #007AFF;
+        }
+        
+        .tab-inactive {
+            color: #8E8E93;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
+        }
+        
+        .third-party-btn:hover {
+            transform: translateY(-1px);
+            transition: transform 0.2s ease;
+        }
+        
+        .loading-spinner {
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-background font-sf">
+    <!-- iOS 状态栏 -->
+    <div id="status-bar" class="fixed top-0 left-0 right-0 h-11 bg-surface flex items-center justify-between px-6 text-sm font-medium text-text-primary z-50">
+        <div class="flex items-center space-x-1">
+            <span>9:41</span>
+        </div>
+        <div class="flex items-center space-x-1">
+            <i class="fas fa-signal text-xs"></i>
+            <i class="fas fa-wifi text-xs"></i>
+            <div class="w-6 h-3 border border-text-primary rounded-sm">
+                <div class="w-4 h-1.5 bg-text-primary rounded-sm m-0.5"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主容器 -->
+    <div id="main-container" class="max-w-sm mx-auto bg-background min-h-screen relative" style="margin-top: 44px;">
+        
+        <!-- 主内容区域 -->
+        <main id="main-content" class="px-6 py-12 min-h-screen flex flex-col">
+            
+            <!-- Logo 和产品名称 -->
+            <section id="logo-section" class="text-center mb-12">
+                <div id="logo-container" class="w-20 h-20 mx-auto mb-6 gradient-bg rounded-3xl flex items-center justify-center">
+                    <i class="fas fa-eye text-white text-3xl"></i>
+                </div>
+                <h1 id="app-title" class="text-3xl font-bold text-text-primary mb-2">镜控智联</h1>
+                <p id="app-subtitle" class="text-text-secondary">智能眼镜管理平台</p>
+            </section>
+
+            <!-- 登录/注册切换标签 -->
+            <section id="tab-section" class="mb-8">
+                <div id="tab-container" class="flex bg-surface rounded-2xl p-1 shadow-card">
+                    <button id="login-tab" class="flex-1 py-3 text-center font-medium rounded-xl tab-active transition-all duration-200">
+                        登录
+                    </button>
+                    <button id="register-tab" class="flex-1 py-3 text-center font-medium rounded-xl tab-inactive transition-all duration-200">
+                        注册
+                    </button>
+                </div>
+            </section>
+
+            <!-- 登录表单 -->
+            <section id="login-form-section" class="space-y-6 flex-1">
+                <form id="login-form" class="space-y-6">
+                    <div id="login-phone-container" class="space-y-2">
+                        <label for="login-phone" class="block text-sm font-medium text-text-primary">手机号</label>
+                        <input type="tel" id="login-phone" name="phone" 
+                               class="w-full px-4 py-3 bg-surface border border-border-light rounded-2xl form-input-focus text-text-primary placeholder-text-secondary" 
+                               placeholder="请输入手机号" maxlength="11">
+                    </div>
+                    
+                    <div id="login-password-container" class="space-y-2">
+                        <label for="login-password" class="block text-sm font-medium text-text-primary">密码</label>
+                        <div class="relative">
+                            <input type="password" id="login-password" name="password" 
+                                   class="w-full px-4 py-3 pr-12 bg-surface border border-border-light rounded-2xl form-input-focus text-text-primary placeholder-text-secondary" 
+                                   placeholder="请输入密码">
+                            <button type="button" id="login-password-toggle" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-text-secondary">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="login-forgot-container" class="text-right">
+                        <button type="button" id="forgot-password-btn" class="text-sm text-primary font-medium">
+                            忘记密码？
+                        </button>
+                    </div>
+                    
+                    <button type="submit" id="login-submit-btn" 
+                            class="w-full py-4 gradient-bg text-white font-semibold rounded-2xl shadow-button hover:shadow-lg transition-all duration-200">
+                        <span id="login-btn-text">登录</span>
+                        <i id="login-loading" class="fas fa-spinner loading-spinner ml-2 hidden"></i>
+                    </button>
+                </form>
+            </section>
+
+            <!-- 注册表单 -->
+            <section id="register-form-section" class="space-y-6 flex-1 hidden">
+                <form id="register-form" class="space-y-6">
+                    <div id="register-phone-container" class="space-y-2">
+                        <label for="register-phone" class="block text-sm font-medium text-text-primary">手机号</label>
+                        <input type="tel" id="register-phone" name="phone" 
+                               class="w-full px-4 py-3 bg-surface border border-border-light rounded-2xl form-input-focus text-text-primary placeholder-text-secondary" 
+                               placeholder="请输入手机号" maxlength="11">
+                    </div>
+                    
+                    <div id="register-code-container" class="space-y-2">
+                        <label for="register-code" class="block text-sm font-medium text-text-primary">验证码</label>
+                        <div class="flex space-x-3">
+                            <input type="text" id="register-code" name="code" 
+                                   class="flex-1 px-4 py-3 bg-surface border border-border-light rounded-2xl form-input-focus text-text-primary placeholder-text-secondary" 
+                                   placeholder="请输入验证码" maxlength="6">
+                            <button type="button" id="send-code-btn" 
+                                    class="px-6 py-3 bg-background text-primary font-medium rounded-2xl border border-border-light hover:bg-border-light transition-all duration-200">
+                                发送验证码
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="register-password-container" class="space-y-2">
+                        <label for="register-password" class="block text-sm font-medium text-text-primary">设置密码</label>
+                        <div class="relative">
+                            <input type="password" id="register-password" name="password" 
+                                   class="w-full px-4 py-3 pr-12 bg-surface border border-border-light rounded-2xl form-input-focus text-text-primary placeholder-text-secondary" 
+                                   placeholder="请设置6-20位密码">
+                            <button type="button" id="register-password-toggle" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-text-secondary">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="register-confirm-password-container" class="space-y-2">
+                        <label for="register-confirm-password" class="block text-sm font-medium text-text-primary">确认密码</label>
+                        <div class="relative">
+                            <input type="password" id="register-confirm-password" name="confirmPassword" 
+                                   class="w-full px-4 py-3 pr-12 bg-surface border border-border-light rounded-2xl form-input-focus text-text-primary placeholder-text-secondary" 
+                                   placeholder="请再次输入密码">
+                            <button type="button" id="register-confirm-password-toggle" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-text-secondary">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" id="register-submit-btn" 
+                            class="w-full py-4 gradient-bg text-white font-semibold rounded-2xl shadow-button hover:shadow-lg transition-all duration-200">
+                        <span id="register-btn-text">注册</span>
+                        <i id="register-loading" class="fas fa-spinner loading-spinner ml-2 hidden"></i>
+                    </button>
+                </form>
+            </section>
+
+            <!-- 忘记密码表单 -->
+            <section id="forgot-password-section" class="space-y-6 flex-1 hidden">
+                <form id="forgot-password-form" class="space-y-6">
+                    <div id="forgot-phone-container" class="space-y-2">
+                        <label for="forgot-phone" class="block text-sm font-medium text-text-primary">手机号</label>
+                        <input type="tel" id="forgot-phone" name="phone" 
+                               class="w-full px-4 py-3 bg-surface border border-border-light rounded-2xl form-input-focus text-text-primary placeholder-text-secondary" 
+                               placeholder="请输入手机号" maxlength="11">
+                    </div>
+                    
+                    <div id="forgot-code-container" class="space-y-2">
+                        <label for="forgot-code" class="block text-sm font-medium text-text-primary">验证码</label>
+                        <div class="flex space-x-3">
+                            <input type="text" id="forgot-code" name="code" 
+                                   class="flex-1 px-4 py-3 bg-surface border border-border-light rounded-2xl form-input-focus text-text-primary placeholder-text-secondary" 
+                                   placeholder="请输入验证码" maxlength="6">
+                            <button type="button" id="forgot-send-code-btn" 
+                                    class="px-6 py-3 bg-background text-primary font-medium rounded-2xl border border-border-light hover:bg-border-light transition-all duration-200">
+                                发送验证码
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="forgot-new-password-container" class="space-y-2">
+                        <label for="forgot-new-password" class="block text-sm font-medium text-text-primary">新密码</label>
+                        <div class="relative">
+                            <input type="password" id="forgot-new-password" name="newPassword" 
+                                   class="w-full px-4 py-3 pr-12 bg-surface border border-border-light rounded-2xl form-input-focus text-text-primary placeholder-text-secondary" 
+                                   placeholder="请设置6-20位新密码">
+                            <button type="button" id="forgot-password-toggle" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-text-secondary">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="flex space-x-3">
+                        <button type="button" id="back-to-login-btn" 
+                                class="flex-1 py-4 bg-background text-text-primary font-semibold rounded-2xl border border-border-light hover:bg-border-light transition-all duration-200">
+                            返回登录
+                        </button>
+                        <button type="submit" id="forgot-submit-btn" 
+                                class="flex-1 py-4 gradient-bg text-white font-semibold rounded-2xl shadow-button hover:shadow-lg transition-all duration-200">
+                            <span id="forgot-btn-text">重置密码</span>
+                            <i id="forgot-loading" class="fas fa-spinner loading-spinner ml-2 hidden"></i>
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- 第三方登录 -->
+            <section id="third-party-section" class="mt-8 space-y-6">
+                <div id="divider" class="flex items-center">
+                    <div class="flex-1 h-px bg-border-light"></div>
+                    <span class="px-4 text-sm text-text-secondary">或</span>
+                    <div class="flex-1 h-px bg-border-light"></div>
+                </div>
+                
+                <div id="third-party-buttons" class="space-y-3">
+                    <button id="wechat-login-btn" class="w-full py-4 bg-success text-white font-semibold rounded-2xl flex items-center justify-center space-x-3 third-party-btn transition-all duration-200">
+                        <i class="fab fa-weixin text-2xl"></i>
+                        <span>微信登录</span>
+                    </button>
+                    
+                    <button id="apple-login-btn" class="w-full py-4 bg-text-primary text-white font-semibold rounded-2xl flex items-center justify-center space-x-3 third-party-btn transition-all duration-200">
+                        <i class="fab fa-apple text-2xl"></i>
+                        <span>Apple ID 登录</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- 用户协议 -->
+            <section id="agreement-section" class="mt-8 mb-8">
+                <p class="text-xs text-text-secondary text-center leading-relaxed">
+                    登录即表示同意
+                    <button type="button" id="user-agreement-link" class="text-primary underline">《用户协议》</button>
+                    和
+                    <button type="button" id="privacy-policy-link" class="text-primary underline">《隐私政策》</button>
+                </p>
+            </section>
+
+        </main>
+
+    </div>
+
+    <!-- 提示弹窗 -->
+    <div id="toast" class="fixed top-20 left-1/2 transform -translate-x-1/2 bg-text-primary text-white px-6 py-3 rounded-2xl text-sm font-medium z-50 hidden">
+        <span id="toast-message">操作成功</span>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // 表单切换功能
+            const loginTab = document.querySelector('#login-tab');
+            const registerTab = document.querySelector('#register-tab');
+            const loginFormSection = document.querySelector('#login-form-section');
+            const registerFormSection = document.querySelector('#register-form-section');
+            const forgotPasswordSection = document.querySelector('#forgot-password-section');
+            const thirdPartySection = document.querySelector('#third-party-section');
+            const agreementSection = document.querySelector('#agreement-section');
+
+            function showLoginForm() {
+                loginTab.classList.remove('tab-inactive');
+                loginTab.classList.add('tab-active');
+                registerTab.classList.remove('tab-active');
+                registerTab.classList.add('tab-inactive');
+                
+                loginFormSection.classList.remove('hidden');
+                registerFormSection.classList.add('hidden');
+                forgotPasswordSection.classList.add('hidden');
+                thirdPartySection.classList.remove('hidden');
+                agreementSection.classList.remove('hidden');
+            }
+
+            function showRegisterForm() {
+                registerTab.classList.remove('tab-inactive');
+                registerTab.classList.add('tab-active');
+                loginTab.classList.remove('tab-active');
+                loginTab.classList.add('tab-inactive');
+                
+                registerFormSection.classList.remove('hidden');
+                loginFormSection.classList.add('hidden');
+                forgotPasswordSection.classList.add('hidden');
+                thirdPartySection.classList.remove('hidden');
+                agreementSection.classList.remove('hidden');
+            }
+
+            function showForgotPasswordForm() {
+                forgotPasswordSection.classList.remove('hidden');
+                loginFormSection.classList.add('hidden');
+                registerFormSection.classList.add('hidden');
+                thirdPartySection.classList.add('hidden');
+                agreementSection.classList.add('hidden');
+            }
+
+            loginTab.addEventListener('click', showLoginForm);
+            registerTab.addEventListener('click', showRegisterForm);
+
+            // 忘记密码按钮
+            document.querySelector('#forgot-password-btn').addEventListener('click', showForgotPasswordForm);
+            
+            // 返回登录按钮
+            document.querySelector('#back-to-login-btn').addEventListener('click', showLoginForm);
+
+            // 密码显示/隐藏切换
+            function setupPasswordToggle(toggleId, inputId) {
+                const toggle = document.querySelector(`#${toggleId}`);
+                const input = document.querySelector(`#${inputId}`);
+                
+                if (toggle && input) {
+                    toggle.addEventListener('click', function() {
+                        const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+                        input.setAttribute('type', type);
+                        
+                        const icon = toggle.querySelector('i');
+                        if (type === 'password') {
+                            icon.classList.remove('fa-eye-slash');
+                            icon.classList.add('fa-eye');
+                        } else {
+                            icon.classList.remove('fa-eye');
+                            icon.classList.add('fa-eye-slash');
+                        }
+                    });
+                }
+            }
+
+            setupPasswordToggle('login-password-toggle', 'login-password');
+            setupPasswordToggle('register-password-toggle', 'register-password');
+            setupPasswordToggle('register-confirm-password-toggle', 'register-confirm-password');
+            setupPasswordToggle('forgot-password-toggle', 'forgot-new-password');
+
+            // 验证码发送功能
+            function setupCodeSender(buttonId, phoneInputId) {
+                const button = document.querySelector(`#${buttonId}`);
+                const phoneInput = document.querySelector(`#${phoneInputId}`);
+                let countdown = 0;
+                
+                button.addEventListener('click', function() {
+                    const phone = phoneInput.value.trim();
+                    
+                    if (!phone) {
+                        showToast('请先输入手机号');
+                        return;
+                    }
+                    
+                    if (!/^1[3-9]\d{9}$/.test(phone)) {
+                        showToast('请输入正确的手机号');
+                        return;
+                    }
+                    
+                    // 开始倒计时
+                    countdown = 60;
+                    button.disabled = true;
+                    button.textContent = `${countdown}s`;
+                    
+                    const timer = setInterval(() => {
+                        countdown--;
+                        button.textContent = `${countdown}s`;
+                        
+                        if (countdown <= 0) {
+                            clearInterval(timer);
+                            button.disabled = false;
+                            button.textContent = '发送验证码';
+                        }
+                    }, 1000);
+                    
+                    showToast('验证码已发送');
+                });
+            }
+
+            setupCodeSender('send-code-btn', 'register-phone');
+            setupCodeSender('forgot-send-code-btn', 'forgot-phone');
+
+            // 表单提交处理
+            function setupFormSubmit(formId, submitBtnId, btnTextId, loadingId, successCallback) {
+                const form = document.querySelector(`#${formId}`);
+                const submitBtn = document.querySelector(`#${submitBtnId}`);
+                const btnText = document.querySelector(`#${btnTextId}`);
+                const loading = document.querySelector(`#${loadingId}`);
+                
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    // 表单验证
+                    if (!validateForm(form)) {
+                        return;
+                    }
+                    
+                    // 显示加载状态
+                    submitBtn.disabled = true;
+                    btnText.textContent = '处理中...';
+                    loading.classList.remove('hidden');
+                    
+                    // 模拟API调用
+                    setTimeout(() => {
+                        successCallback();
+                        
+                        // 恢复按钮状态
+                        submitBtn.disabled = false;
+                        btnText.textContent = formId.includes('login') ? '登录' : formId.includes('register') ? '注册' : '重置密码';
+                        loading.classList.add('hidden');
+                    }, 2000);
+                });
+            }
+
+            function validateForm(form) {
+                const inputs = form.querySelectorAll('input[required], input[type="tel"], input[type="password"], input[type="text"]');
+                
+                for (let input of inputs) {
+                    const value = input.value.trim();
+                    
+                    if (!value) {
+                        showToast(`请输入${input.previousElementSibling.textContent}`);
+                        input.focus();
+                        return false;
+                    }
+                    
+                    if (input.type === 'tel' && !/^1[3-9]\d{9}$/.test(value)) {
+                        showToast('请输入正确的手机号');
+                        input.focus();
+                        return false;
+                    }
+                    
+                    if (input.type === 'password' && value.length < 6) {
+                        showToast('密码长度不能少于6位');
+                        input.focus();
+                        return false;
+                    }
+                    
+                    if (input.name === 'confirmPassword') {
+                        const passwordInput = form.querySelector('input[name="password"]');
+                        if (value !== passwordInput.value) {
+                            showToast('两次输入的密码不一致');
+                            input.focus();
+                            return false;
+                        }
+                    }
+                    
+                    if (input.name === 'code' && !/^\d{6}$/.test(value)) {
+                        showToast('请输入6位数字验证码');
+                        input.focus();
+                        return false;
+                    }
+                }
+                
+                return true;
+            }
+
+            // 登录表单提交
+            setupFormSubmit('login-form', 'login-submit-btn', 'login-btn-text', 'login-loading', function() {
+                showToast('登录成功');
+                setTimeout(() => {
+                    window.location.href = 'P-HOME.html';
+                }, 1000);
+            });
+
+            // 注册表单提交
+            setupFormSubmit('register-form', 'register-submit-btn', 'register-btn-text', 'register-loading', function() {
+                showToast('注册成功');
+                setTimeout(() => {
+                    showLoginForm();
+                }, 1000);
+            });
+
+            // 忘记密码表单提交
+            setupFormSubmit('forgot-password-form', 'forgot-submit-btn', 'forgot-btn-text', 'forgot-loading', function() {
+                showToast('密码重置成功');
+                setTimeout(() => {
+                    showLoginForm();
+                }, 1000);
+            });
+
+            // 第三方登录
+            document.querySelector('#wechat-login-btn').addEventListener('click', function() {
+                console.log('需要调用第三方接口实现微信登录');
+                showToast('微信登录成功');
+                setTimeout(() => {
+                    window.location.href = 'P-HOME.html';
+                }, 1000);
+            });
+
+            document.querySelector('#apple-login-btn').addEventListener('click', function() {
+                console.log('需要调用第三方接口实现Apple ID登录');
+                showToast('Apple ID登录成功');
+                setTimeout(() => {
+                    window.location.href = 'P-HOME.html';
+                }, 1000);
+            });
+
+            // 协议链接跳转
+            document.querySelector('#user-agreement-link').addEventListener('click', function() {
+                window.location.href = 'P-USER_AGREEMENT.html';
+            });
+
+            document.querySelector('#privacy-policy-link').addEventListener('click', function() {
+                window.location.href = 'P-PRIVACY_POLICY.html';
+            });
+
+            // 提示弹窗功能
+            function showToast(message) {
+                const toast = document.querySelector('#toast');
+                const toastMessage = document.querySelector('#toast-message');
+                
+                toastMessage.textContent = message;
+                toast.classList.remove('hidden');
+                
+                setTimeout(() => {
+                    toast.classList.add('hidden');
+                }, 3000);
+            }
+
+        });
+    </script>
+</body>
+</html>

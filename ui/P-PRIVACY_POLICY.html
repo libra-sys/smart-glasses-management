@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>隐私政策 - 镜控智联</title>
+    <script src="https://unpkg.byted-static.com/coze/space_ppt_lib/1.0.3-alpha.12/lib/tailwindcss.js"></script>
+    <script src="https://unpkg.byted-static.com/fortawesome/fontawesome-free/6.7.2/js/all.min.js" data-auto-replace-svg="nest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#007AFF',
+                        secondary: '#5856D6',
+                        success: '#34C759',
+                        danger: '#FF3B30',
+                        warning: '#FF9500',
+                        info: '#5AC8FA',
+                        background: '#F2F2F7',
+                        surface: '#FFFFFF',
+                        'text-primary': '#000000',
+                        'text-secondary': '#8E8E93',
+                        'text-tertiary': '#C7C7CC',
+                        'border-light': '#E5E5EA'
+                    },
+                    fontFamily: {
+                        'sf': ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Helvetica Neue', 'Arial', 'sans-serif']
+                    },
+                    boxShadow: {
+                        'card': '0 2px 10px rgba(0, 0, 0, 0.08)',
+                        'button': '0 2px 8px rgba(0, 122, 255, 0.2)'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .safe-bottom {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        
+        .content-section {
+            margin-bottom: 24px;
+        }
+        
+        .content-section h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #000000;
+            margin-bottom: 12px;
+        }
+        
+        .content-section h4 {
+            font-size: 16px;
+            font-weight: 500;
+            color: #000000;
+            margin-bottom: 8px;
+            margin-top: 16px;
+        }
+        
+        .content-section p {
+            font-size: 14px;
+            color: #3C3C43;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+        
+        .content-section ul {
+            font-size: 14px;
+            color: #3C3C43;
+            line-height: 1.6;
+            margin-left: 16px;
+            margin-bottom: 12px;
+        }
+        
+        .content-section li {
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body class="bg-background font-sf">
+    <!-- iOS 状态栏 -->
+    <div id="status-bar" class="fixed top-0 left-0 right-0 h-11 bg-surface flex items-center justify-between px-6 text-sm font-medium text-text-primary z-50">
+        <div class="flex items-center space-x-1">
+            <span>9:41</span>
+        </div>
+        <div class="flex items-center space-x-1">
+            <i class="fas fa-signal text-xs"></i>
+            <i class="fas fa-wifi text-xs"></i>
+            <div class="w-6 h-3 border border-text-primary rounded-sm">
+                <div class="w-4 h-1.5 bg-text-primary rounded-sm m-0.5"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主容器 -->
+    <div id="main-container" class="max-w-sm mx-auto bg-surface min-h-screen relative" style="margin-top: 44px;">
+        
+        <!-- 顶部导航栏 -->
+        <header id="top-header" class="bg-surface px-6 py-4 border-b border-border-light">
+            <div id="header-content" class="flex items-center">
+                <button id="back-btn" class="w-10 h-10 flex items-center justify-center mr-4">
+                    <i class="fas fa-chevron-left text-primary text-lg"></i>
+                </button>
+                <h1 id="page-title" class="text-lg font-semibold text-text-primary">隐私政策</h1>
+            </div>
+        </header>
+
+        <!-- 主内容区域 -->
+        <main id="main-content" class="px-6 py-6 safe-bottom">
+            
+            <!-- 隐私政策内容 -->
+            <div id="privacy-content" class="space-y-6">
+                
+                <!-- 生效日期 -->
+                <div id="effective-date" class="bg-background rounded-2xl p-4">
+                    <p class="text-sm text-text-secondary text-center">
+                        <strong>生效日期：</strong>2024年1月1日<br>
+                        <strong>最后更新：</strong>2024年1月1日
+                    </p>
+                </div>
+
+                <!-- 引言 -->
+                <div id="introduction" class="content-section">
+                    <p>
+                        感谢您使用镜控智联应用程序！我们深知个人信息对您的重要性，并会全力保护您的个人信息安全可靠。我们致力于维持您对我们的信任，恪守以下原则，保护您的个人信息：权责一致原则、目的明确原则、选择同意原则、最少够用原则、确保安全原则、主体参与原则、公开透明原则等。
+                    </p>
+                    <p>
+                        本隐私政策适用于镜控智联应用程序（以下简称"本应用"）。请您仔细阅读本隐私政策，了解我们如何收集、使用、存储和保护您的个人信息。
+                    </p>
+                </div>
+
+                <!-- 信息收集 -->
+                <div id="information-collection" class="content-section">
+                    <h3>一、我们收集的信息</h3>
+                    
+                    <h4>1.1 您主动提供的信息</h4>
+                    <ul class="list-disc">
+                        <li>注册信息：手机号码、邮箱地址、密码</li>
+                        <li>个人资料：昵称、头像</li>
+                        <li>设备信息：设备名称、设备型号、设备标识符</li>
+                        <li>自定义内容：自定义音效文件</li>
+                    </ul>
+                    
+                    <h4>1.2 自动收集的信息</h4>
+                    <ul class="list-disc">
+                        <li>设备信息：设备型号、操作系统版本、设备标识符</li>
+                        <li>使用信息：应用使用情况、功能偏好设置</li>
+                        <li>连接信息：蓝牙连接状态、Wi-Fi连接状态</li>
+                        <li>日志信息：错误日志、性能数据</li>
+                    </ul>
+                </div>
+
+                <!-- 信息使用 -->
+                <div id="information-usage" class="content-section">
+                    <h3>二、我们如何使用您的信息</h3>
+                    <p>我们使用收集的信息用于以下目的：</p>
+                    <ul class="list-disc">
+                        <li>提供、维护和改进我们的服务</li>
+                        <li>处理您的注册、登录和账户管理</li>
+                        <li>实现设备连接和管理功能</li>
+                        <li>提供个性化的用户体验</li>
+                        <li>发送重要通知和服务更新</li>
+                        <li>进行安全检测和欺诈防护</li>
+                        <li>分析使用趋势以改善我们的服务</li>
+                        <li>遵守法律法规要求</li>
+                    </ul>
+                </div>
+
+                <!-- 信息共享 -->
+                <div id="information-sharing" class="content-section">
+                    <h3>三、我们如何共享您的信息</h3>
+                    <p>我们不会向第三方出售、出租或以其他方式披露您的个人信息，除非：</p>
+                    <ul class="list-disc">
+                        <li>获得您的明确同意</li>
+                        <li>为提供您请求的服务而必须共享</li>
+                        <li>为遵守法律法规、政府要求或司法程序</li>
+                        <li>为保护我们的权利、财产或安全，或用户的权利、财产或安全</li>
+                        <li>在业务转让、合并或收购的情况下</li>
+                    </ul>
+                </div>
+
+                <!-- 信息存储 -->
+                <div id="information-storage" class="content-section">
+                    <h3>四、信息存储和安全</h3>
+                    
+                    <h4>4.1 存储地点</h4>
+                    <p>您的个人信息主要存储在中国境内的安全服务器上。</p>
+                    
+                    <h4>4.2 存储期限</h4>
+                    <p>我们会在实现收集目的所必需的期间内保留您的个人信息，或按照法律法规要求的期限保留。</p>
+                    
+                    <h4>4.3 安全措施</h4>
+                    <p>我们采取以下安全措施保护您的个人信息：</p>
+                    <ul class="list-disc">
+                        <li>使用加密技术保护数据传输和存储</li>
+                        <li>实施访问控制和身份验证机制</li>
+                        <li>定期进行安全审计和漏洞修复</li>
+                        <li>建立数据泄露应急响应机制</li>
+                    </ul>
+                </div>
+
+                <!-- 用户权利 -->
+                <div id="user-rights" class="content-section">
+                    <h3>五、您的权利</h3>
+                    <p>关于您的个人信息，您拥有以下权利：</p>
+                    <ul class="list-disc">
+                        <li><strong>访问权：</strong>您有权了解我们收集、使用您个人信息的情况</li>
+                        <li><strong>更正权：</strong>您有权要求我们更正或补充您的个人信息</li>
+                        <li><strong>删除权：</strong>您有权要求我们删除您的个人信息</li>
+                        <li><strong>撤回同意：</strong>您有权撤回您此前给予的授权同意</li>
+                        <li><strong>投诉举报：</strong>您有权向监管部门投诉举报</li>
+                    </ul>
+                </div>
+
+                <!-- 第三方服务 -->
+                <div id="third-party-services" class="content-section">
+                    <h3>六、第三方服务</h3>
+                    <p>
+                        本应用可能包含第三方服务的链接或集成，如微信登录、Apple ID登录等。这些第三方服务有自己的隐私政策，我们建议您仔细阅读这些政策。我们不对第三方的隐私实践承担责任。
+                    </p>
+                </div>
+
+                <!-- 未成年人保护 -->
+                <div id="minors-protection" class="content-section">
+                    <h3>七、未成年人保护</h3>
+                    <p>
+                        我们非常重视未成年人的个人信息保护。如果您是14周岁以下的未成年人，请在监护人的陪同下阅读本隐私政策，并在监护人同意后使用我们的服务。如果您是未成年人的监护人，当您对您所监护的未成年人的个人信息处理存在疑问时，请联系我们。
+                    </p>
+                </div>
+
+                <!-- 政策更新 -->
+                <div id="policy-updates" class="content-section">
+                    <h3>八、本政策的更新</h3>
+                    <p>
+                        我们可能会不时更新本隐私政策。当我们更新政策时，我们会在应用内通知您，并在本页面发布最新版本。重大变更时，我们还会通过邮件或应用内弹窗的方式进行通知。
+                    </p>
+                </div>
+
+                <!-- 联系我们 -->
+                <div id="contact-us" class="content-section">
+                    <h3>九、联系我们</h3>
+                    <p>
+                        如果您对本隐私政策有任何疑问、意见或建议，或者需要行使您的个人信息权利，请通过以下方式联系我们：
+                    </p>
+                    <ul class="list-none ml-0">
+                        <li class="mb-2">
+                            <i class="fas fa-envelope text-primary mr-2"></i>
+                            <strong>邮箱：</strong>privacy@jingkong.com
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-phone text-primary mr-2"></i>
+                            <strong>电话：</strong>400-123-4567
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-map-marker-alt text-primary mr-2"></i>
+                            <strong>地址：</strong>北京市朝阳区科技园区123号
+                        </li>
+                    </ul>
+                    <p>
+                        我们将在收到您的请求后15个工作日内予以回复。
+                    </p>
+                </div>
+
+                <!-- 结尾声明 -->
+                <div id="final-statement" class="bg-background rounded-2xl p-4">
+                    <p class="text-sm text-text-secondary text-center">
+                        本隐私政策的解释权归镜控智联所有。
+                    </p>
+                </div>
+
+            </div>
+
+        </main>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // 返回按钮点击事件
+            document.querySelector('#back-btn').addEventListener('click', function() {
+                // 检查来源页面，默认返回账户设置页
+                const referrer = document.referrer;
+                if (referrer.includes('P-LOGIN_REGISTER.html')) {
+                    window.location.href = 'P-LOGIN_REGISTER.html';
+                } else {
+                    window.location.href = 'P-ACCOUNT_SETTINGS.html';
+                }
+            });
+
+            // 平滑滚动到页面顶部（可选）
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+        });
+    </script>
+</body>
+</html>

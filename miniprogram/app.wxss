@@ -1,0 +1,103 @@
+/**app.wxss**/
+/* ========== 全局样式 ========== */
+
+/* 全局页面样式 */
+page {
+  background: #F2F2F7;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 容器样式 */
+.container {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  min-height: 100vh;
+}
+
+/* ========== 按钮重置 ========== */
+button {
+  background: initial;
+  border: none;
+  padding: 0;
+  margin: 0;
+  line-height: inherit;
+  font-size: inherit;
+}
+
+button:focus {
+  outline: 0;
+}
+
+button::after {
+  border: none;
+}
+
+/* ========== 全局颜色变量 ========== */
+page {
+  --color-primary: #007AFF;
+  --color-secondary: #5856D6;
+  --color-success: #34C759;
+  --color-warning: #FF9500;
+  --color-danger: #FF3B30;
+  --color-info: #5AC8FA;
+  
+  --bg-primary: #F2F2F7;
+  --bg-secondary: #FFFFFF;
+  --bg-tertiary: #E5E5EA;
+  
+  --text-primary: #000000;
+  --text-secondary: #8E8E93;
+  --text-tertiary: #C7C7CC;
+  
+  --border-color: #E5E5EA;
+  --shadow-sm: 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4rpx 16rpx rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8rpx 24rpx rgba(0, 0, 0, 0.12);
+}
+
+/* ========== 通用工具类 ========== */
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-column {
+  flex-direction: column;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ========== 安全区适配 ========== */
+.safe-area-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
