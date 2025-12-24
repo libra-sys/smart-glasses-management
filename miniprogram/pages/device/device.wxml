@@ -29,11 +29,6 @@
             <text class="device-status">已绑定</text>
           </view>
           <button class="unbind-btn" bindtap="unbindDevice" data-index="{{index}}">解除绑定</button>
-        <view wx:if="{{connectedDevice && connectedDevice.deviceId === item.deviceId}}" class="device-controls">
-          <button class="control-btn" bindtap="queryBattery">🔋 查询电量</button>
-          <button class="control-btn" bindtap="powerOff">⚡ 关机</button>
-          <button class="ai-toggle-btn" bindtap="toggleAiMode">{{aiModeEnabled ? 'AI增强已开启' : '开启AI增强'}}</button>
-        </view>
         </view>
       </view>
       
@@ -41,6 +36,16 @@
         <text class="icon">🔗</text>
         <text class="text">暂无已绑定设备</text>
         <button class="add-btn" bindtap="startSearch">添加设备</button>
+      </view>
+    </view>
+
+    <!-- 设备控制区域（连接后显示） -->
+    <view wx:if="{{connectedDevice}}" class="control-section">
+      <text class="section-title">设备控制</text>
+      <view class="device-controls">
+        <button class="control-btn" bindtap="queryBattery">🔋 查询电量</button>
+        <button class="control-btn" bindtap="powerOff">⚡ 关机</button>
+        <button class="ai-toggle-btn" bindtap="toggleAiMode">{{aiModeEnabled ? 'AI增强已开启' : '开启AI增强'}}</button>
       </view>
     </view>
 

@@ -157,6 +157,15 @@
   gap: 12rpx;
 }
 
+/* 设备控制区域样式 */
+.control-section {
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 32rpx;
+  margin-bottom: 32rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
+}
+
 .control-btn {
   width: 100%;
   padding: 18rpx;

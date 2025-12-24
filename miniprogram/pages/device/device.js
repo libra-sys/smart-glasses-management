@@ -1035,11 +1035,21 @@ Page({
 
   /**
    * 页面显示时执行
-   * 加载AI模式状态
+   * 加载AI模式状态和设备连接状态
    */
   onShow() {
     // 加载AI模式状态
     const aiModeEnabled = wx.getStorageSync('aiModeEnabled') || false;
     this.setData({ aiModeEnabled });
+    
+    // 重新加载已绑定设备和连接状态
+    this.loadBoundDevices();
+    
+    // 加载已配对设备信息
+    const pairedDevice = wx.getStorageSync('pairedDevice');
+    if (pairedDevice) {
+      this.setData({ connectedDevice: pairedDevice });
+      console.log('从存储加载已连接设备:', pairedDevice);
+    }
   }
 });
