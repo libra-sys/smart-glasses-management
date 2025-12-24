@@ -148,9 +148,10 @@ class PowerCallbacks: public BLECharacteristicCallbacks {
         Serial.println("[BLE] Power ON command");
         // 实际开机逻辑
       } else if (cmd == 0) {
-        Serial.println("[BLE] Power OFF command");
-        // 实际关机逻辑（如进入深度睡眠）
-        // esp_deep_sleep_start();
+        Serial.println("[BLE] Power OFF command - entering deep sleep");
+        // 关机逻辑：进入深度睡眠
+        delay(500);  // 给串口时间打印日志
+        esp_deep_sleep_start();
       }
     }
   }
