@@ -1,6 +1,7 @@
 // device.js
 // 设备管理页面，实现蓝牙设备搜索、连接、绑定和AI模式控制功能
 const bluetoothManager = require('../../utils/bluetooth.js');
+const GlassesServerAPI = require('../../utils/glasses-server-api.js');
 
 Page({
   data: {
@@ -16,8 +17,9 @@ Page({
     systemDeviceNames: {},    // 存储系统已配对设备的名称映射 {deviceId: systemName}
     writeServiceId: '',       // 可写服务ID
     writeCharacteristicId: '', // 可写特征值ID
-    notifyServiceId: '',      // 通知服务ID
-    notifyCharacteristicId: '' // 通知特征值ID
+    notifyServiceId: '',       // 通知服务ID
+    notifyCharacteristicId: '', // 通知特征值ID
+    locationTimer: null        // 定位上报定时器
   },
 
   /**
@@ -31,6 +33,11 @@ Page({
     this.loadBoundDevices();       // 从本地存储加载已绑定设备
     this.loadCustomNames();        // 加载自定义名称
     this.loadSystemPairedDevices(); // 加载系统已配对设备
+    this.startLocationUpload();     // 启动手机定位上报
+  },
+
+  onUnload() {
+    this.stopLocationUpload();      // 页面卸载时停止定位上报
   },
 
   /**
@@ -61,6 +68,45 @@ Page({
     wx.onBluetoothAdapterStateChange((res) => {
       this.setData({ bluetoothEnabled: res.available });
     });
+  },
+
+  /**
+   * 启动基于手机定位的上报，用于无GPS硬件的导航
+   */
+  startLocationUpload() {
+    this.stopLocationUpload();
+
+    if (!GlassesServerAPI.isServerConfigured()) {
+      console.log('服务器未配置，跳过定位上报');
+      return;
+    }
+
+    const timer = setInterval(() => {
+      wx.getLocation({
+        type: 'gcj02',
+        success: (res) => {
+          GlassesServerAPI.updateLocation(res.latitude, res.longitude, res.accuracy)
+            .catch(err => {
+              console.log('上报定位失败:', err);
+            });
+        },
+        fail: (err) => {
+          console.log('获取定位失败:', err);
+        }
+      });
+    }, 30000); // 每30秒上报一次定位
+
+    this.setData({ locationTimer: timer });
+  },
+
+  /**
+   * 停止手机定位上报
+   */
+  stopLocationUpload() {
+    if (this.data.locationTimer) {
+      clearInterval(this.data.locationTimer);
+      this.setData({ locationTimer: null });
+    }
   },
 
   /**
@@ -901,6 +947,52 @@ Page({
     });
     // 保存AI模式状态到本地存储
     wx.setStorageSync('aiModeEnabled', this.data.aiModeEnabled);
+  },
+
+  /**
+   * 查询设备电量
+   */
+  queryBattery() {
+    bluetoothManager.getBattery()
+      .then(() => {
+        wx.showToast({
+          title: '已发送查询指令',
+          icon: 'success'
+        });
+      })
+      .catch(() => {
+        wx.showToast({
+          title: '设备未连接',
+          icon: 'none'
+        });
+      });
+  },
+
+  /**
+   * 设备关机
+   */
+  powerOff() {
+    wx.showModal({
+      title: '确认关机',
+      content: '确定要关闭设备吗？',
+      success: (res) => {
+        if (res.confirm) {
+          bluetoothManager.powerOff()
+            .then(() => {
+              wx.showToast({
+                title: '关机指令已发送',
+                icon: 'success'
+              });
+            })
+            .catch(() => {
+              wx.showToast({
+                title: '设备未连接',
+                icon: 'none'
+              });
+            });
+        }
+      }
+    });
   },
 
   /**

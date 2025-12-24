@@ -18,12 +18,14 @@
   <view class="main-content">
     <!-- 用户信息 -->
     <view class="user-card">
-      <view class="user-avatar-wrapper">
+      <image wx:if="{{userInfo.avatar}}" class="user-avatar-img" src="{{userInfo.avatar}}" mode="aspectFill" bindtap="changeAvatar" />
+      <view wx:else class="user-avatar-wrapper" bindtap="changeAvatar">
         <text class="user-avatar-text">{{userInfo.username ? userInfo.username.substring(0,1) : '游'}}</text>
       </view>
       <view class="user-info">
         <text class="user-name">{{userInfo.username || '游客'}}</text>
-        <text class="user-phone">{{userInfo.phone || '未绑定手机'}}</text>
+        <text class="user-email">{{userInfo.email || '未登录'}}</text>
+        <text wx:if="{{userInfo.loginType}}" class="user-login-type">💚 微信登录</text>
       </view>
     </view>
 

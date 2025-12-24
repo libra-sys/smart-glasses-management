@@ -1,11 +1,13 @@
-// login.js
+const { UserAPI } = require('../../utils/api.js');
+
 Page({
   data: {
-    isLogin: true, // 是否为登录模式
+    isLogin: true,
     phone: '',
     password: '',
     username: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    email: ''
   },
 
   // 切换到登录
@@ -23,6 +25,10 @@ Page({
     this.setData({ phone: e.detail.value });
   },
 
+  onEmailInput(e) {
+    this.setData({ email: e.detail.value });
+  },
+
   onPasswordInput(e) {
     this.setData({ password: e.detail.value });
   },
@@ -37,79 +43,79 @@ Page({
 
   // 登录
   handleLogin() {
-    const { phone, password } = this.data;
+    const { email, phone, password } = this.data;
     
-    // 验证手机号
-    if (!phone || !/^1[3-9]\d{9}$/.test(phone)) {
+    let loginEmail = email || phone;
+    if (!loginEmail) {
       wx.showToast({
-        title: '请输入正确的手机号',
+        title: '请输入邮箱或手机号',
         icon: 'none'
       });
       return;
     }
 
-    // 验证密码
+    // 如果是手机号，转换为邮箱格式
+    if (/^1[3-9]\d{9}$/.test(loginEmail)) {
+      loginEmail = loginEmail + '@aiglasses.local';
+    } else if (!loginEmail.includes('@')) {
+      // 如果不是邮箱格式，自动添加域名
+      loginEmail = loginEmail + '@aiglasses.local';
+    }
+
     if (!password || password.length < 6) {
       wx.showToast({
-        title: '请输入密码',
+        title: '请输入密码（6位以上）',
         icon: 'none'
       });
       return;
     }
 
-    // 调用云函数登录
     wx.showLoading({ title: '登录中...' });
     
-    wx.cloud.callFunction({
-      name: 'quickstartFunctions',
-      data: {
-        type: 'userLogin',
-        data: {
-          phone: phone,
-          password: password
-        }
-      }
-    }).then(res => {
-      wx.hideLoading();
-      console.log('登录结果：', res);
-      
-      if (res.result.success) {
-        // 保存登录状态
-        wx.setStorageSync('isLoggedIn', true);
-        wx.setStorageSync('userInfo', res.result.data);
-
-        wx.showToast({
-          title: '登录成功',
-          icon: 'success'
-        });
-
-        // 跳转到首页
-        setTimeout(() => {
-          wx.reLaunch({
-            url: '/pages/index/index'
+    UserAPI.login(loginEmail, password)
+      .then(res => {
+        wx.hideLoading();
+        console.log('登录结果：', res);
+        
+        if (res.success) {
+          wx.setStorageSync('isLoggedIn', true);
+          wx.setStorageSync('userInfo', {
+            id: res.userId,
+            email: res.email,
+            username: res.username || loginEmail
           });
-        }, 1500);
-      } else {
+
+          wx.showToast({
+            title: '登录成功',
+            icon: 'success'
+          });
+
+          setTimeout(() => {
+            wx.reLaunch({
+              url: '/pages/index/index'
+            });
+          }, 1500);
+        } else {
+          wx.showToast({
+            title: res.message || '登录失败',
+            icon: 'none'
+          });
+        }
+      })
+      .catch(err => {
+        wx.hideLoading();
+        console.error('登录失败：', err);
         wx.showToast({
-          title: res.result.message || '登录失败',
+          title: '登录失败，请重试',
           icon: 'none'
         });
-      }
-    }).catch(err => {
-      wx.hideLoading();
-      console.error('登录失败：', err);
-      wx.showToast({
-        title: '登录失败，请重试',
-        icon: 'none'
       });
-    });
   },
 
   // 注册
   handleRegister() {
-    const { username, phone, password, confirmPassword } = this.data;
+    const { username, email, phone, password, confirmPassword } = this.data;
 
-    // 验证用户名
     if (!username || username.length < 2) {
       wx.showToast({
         title: '请输入用户名（至少2个字符）',
@@ -118,16 +124,23 @@ Page({
       return;
     }
 
-    // 验证手机号
-    if (!phone || !/^1[3-9]\d{9}$/.test(phone)) {
+    let registerEmail = email || phone;
+    if (!registerEmail) {
       wx.showToast({
-        title: '请输入正确的手机号',
+        title: '请输入邮箱或手机号',
         icon: 'none'
       });
       return;
     }
 
-    // 验证密码
+    // 如果是手机号，转换为邮箱格式
+    if (/^1[3-9]\d{9}$/.test(registerEmail)) {
+      registerEmail = registerEmail + '@aiglasses.local';
+    } else if (!registerEmail.includes('@')) {
+      // 如果不是邮箱格式，自动添加域名
+      registerEmail = registerEmail + '@aiglasses.local';
+    }
+
     if (!password || password.length < 6 || password.length > 16) {
       wx.showToast({
         title: '密码长度应为6-16位',
@@ -136,7 +149,6 @@ Page({
       return;
     }
 
-    // 验证密码一致性
     if (password !== confirmPassword) {
       wx.showToast({
         title: '两次密码输入不一致',
@@ -145,64 +157,55 @@ Page({
       return;
     }
 
-    // 调用云函数注册
     wx.showLoading({ title: '注册中...' });
     
-    wx.cloud.callFunction({
-      name: 'quickstartFunctions',
-      data: {
-        type: 'userRegister',
-        data: {
-          username: username,
-          phone: phone,
-          password: password
-        }
-      }
-    }).then(res => {
-      wx.hideLoading();
-      console.log('注册结果：', res);
-      
-      if (res.result.success) {
-        wx.showToast({
-          title: '注册成功',
-          icon: 'success'
-        });
-
-        // 自动切换到登录
-        setTimeout(() => {
-          this.setData({ 
-            isLogin: true,
-            password: '',
-            confirmPassword: ''
+    UserAPI.register(registerEmail, password, username)
+      .then(res => {
+        wx.hideLoading();
+        console.log('注册结果：', res);
+        
+        if (res.success) {
+          wx.showToast({
+            title: '注册成功',
+            icon: 'success'
           });
-        }, 1500);
-      } else {
+
+          setTimeout(() => {
+            this.setData({ 
+              isLogin: true,
+              password: '',
+              confirmPassword: ''
+            });
+          }, 1500);
+        } else {
+          wx.showToast({
+            title: res.message || '注册失败',
+            icon: 'none'
+          });
+        }
+      })
+      .catch(err => {
+        wx.hideLoading();
+        console.error('注册失败：', err);
         wx.showToast({
-          title: res.result.message || '注册失败',
+          title: '注册失败，请重试',
           icon: 'none'
         });
-      }
-    }).catch(err => {
-      wx.hideLoading();
-      console.error('注册失败：', err);
-      wx.showToast({
-        title: '注册失败，请重试',
-        icon: 'none'
       });
-    });
   },
 
   // 微信一键登录
   handleWechatLogin() {
-    wx.showLoading({ title: '登录中...' });
-    
-    // 获取微信用户信息
+    // 先获取用户信息（必须在按钮点击事件中直接调用）
     wx.getUserProfile({
       desc: '用于完善用户资料',
       success: (res) => {
-        console.log('用户信息：', res.userInfo);
+        const { nickName, avatarUrl } = res.userInfo;
+        console.log('用户信息：', nickName, avatarUrl);
         
-        // 调用云函数微信登录
+        wx.showLoading({ title: '登录中...' });
+        
+        // 调用云函数登录
         wx.cloud.callFunction({
           name: 'quickstartFunctions',
           data: {
@@ -211,21 +214,23 @@ Page({
               userInfo: res.userInfo
             }
           }
-        }).then(result => {
+        }).then(cloudRes => {
           wx.hideLoading();
-          console.log('微信登录结果：', result);
+          console.log('微信登录结果：', cloudRes.result);
           
-          if (result.result.success) {
-            // 保存登录状态
+          if (cloudRes.result.success) {
+            const userData = cloudRes.result.data;
             wx.setStorageSync('isLoggedIn', true);
-            wx.setStorageSync('userInfo', result.result.data);
+            wx.setStorageSync('userInfo', {
+              id: userData.userId,
+              email: `wx_${userData.userId}@aiglasses.local`
+            });
 
             wx.showToast({
               title: '登录成功',
               icon: 'success'
             });
 
-            // 跳转到首页
             setTimeout(() => {
               wx.reLaunch({
                 url: '/pages/index/index'
@@ -233,7 +238,7 @@ Page({
             }, 1500);
           } else {
             wx.showToast({
-              title: result.result.message || '登录失败',
+              title: cloudRes.result.message || '登录失败',
               icon: 'none'
             });
           }
@@ -247,9 +252,8 @@ Page({
         });
       },
       fail: () => {
-        wx.hideLoading();
         wx.showToast({
-          title: '登录取消',
+          title: '取消授权',
           icon: 'none'
         });
       }

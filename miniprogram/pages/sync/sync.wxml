@@ -1,0 +1,39 @@
+<view class="container">
+  <view class="header">
+    <text class="title">数据同步到可视化大屏</text>
+  </view>
+
+  <view class="sync-panel">
+    <view class="info-item">
+      <text class="label">目标地址:</text>
+      <text class="value">https://help.hlw.work</text>
+    </view>
+
+    <view class="info-item">
+      <text class="label">上次同步:</text>
+      <text class="value">{{lastSyncTime || '从未同步'}}</text>
+    </view>
+
+    <view class="info-item">
+      <text class="label">自动同步:</text>
+      <switch checked="{{autoSync}}" bindchange="toggleAutoSync" />
+    </view>
+  </view>
+
+  <view class="actions">
+    <button 
+      type="primary" 
+      bindtap="syncNow" 
+      loading="{{syncing}}"
+      disabled="{{syncing}}">
+      {{syncing ? '同步中...' : '立即同步'}}
+    </button>
+  </view>
+
+  <view class="tips">
+    <text class="tip-title">说明：</text>
+    <text class="tip-text">• 手动点击"立即同步"可推送一次数据</text>
+    <text class="tip-text">• 开启"自动同步"后每分钟自动推送一次</text>
+    <text class="tip-text">• 推送内容：设备、统计、AI数据、服务日志</text>
+  </view>
+</view>

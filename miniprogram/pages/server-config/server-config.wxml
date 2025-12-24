@@ -1,0 +1,152 @@
+<view class="container">
+  <view class="header">
+    <text class="title">服务器配置</text>
+    <text class="subtitle">连接您的眼镜服务器</text>
+  </view>
+
+  <!-- 已连接状态 -->
+  <view wx:if="{{connectedServer}}" class="connected-section">
+    <view class="status-badge success">
+      <text class="badge-icon">✓</text>
+      <text class="badge-text">已连接</text>
+    </view>
+
+    <view class="server-info">
+      <view class="info-row">
+        <text class="label">服务器名称</text>
+        <text class="value">{{connectedServer.name}}</text>
+      </view>
+      <view class="info-row">
+        <text class="label">IP地址</text>
+        <text class="value">{{connectedServer.ip}}</text>
+      </view>
+      <view class="info-row">
+        <text class="label">端口</text>
+        <text class="value">{{connectedServer.port}}</text>
+      </view>
+      <view class="info-row">
+        <text class="label">版本</text>
+        <text class="value">{{connectedServer.version}}</text>
+      </view>
+      <view class="info-row">
+        <text class="label">连接时间</text>
+        <text class="value">{{connectedServer.connectedAt}}</text>
+      </view>
+    </view>
+
+    <view class="actions">
+      <button class="action-btn test-btn" bindtap="testConnection">
+        测试连接
+      </button>
+      <button class="action-btn disconnect-btn" bindtap="disconnectServer">
+        断开连接
+      </button>
+    </view>
+  </view>
+
+  <!-- 未连接状态 -->
+  <view wx:else class="config-section">
+    <!-- 模式切换 -->
+    <view class="mode-tabs">
+      <view 
+        class="tab {{configMode === 'scan' ? 'active' : ''}}"
+        data-mode="scan"
+        bindtap="switchMode">
+        <text class="tab-icon">📡</text>
+        <text class="tab-text">自动扫描</text>
+      </view>
+      <view 
+        class="tab {{configMode === 'manual' ? 'active' : ''}}"
+        data-mode="manual"
+        bindtap="switchMode">
+        <text class="tab-icon">⌨️</text>
+        <text class="tab-text">手动输入</text>
+      </view>
+    </view>
+
+    <!-- 扫描模式 -->
+    <view wx:if="{{configMode === 'scan'}}" class="scan-mode">
+      <button 
+        class="scan-btn"
+        bindtap="startScan"
+        loading="{{scanning}}"
+        disabled="{{scanning}}">
+        {{scanning ? '扫描中...' : '开始扫描局域网'}}
+      </button>
+
+      <view wx:if="{{discoveredServers.length > 0}}" class="server-list">
+        <text class="list-title">发现的服务器 ({{discoveredServers.length}})</text>
+        
+        <view 
+          wx:for="{{discoveredServers}}" 
+          wx:key="ip"
+          class="server-item"
+          data-server="{{item}}"
+          bindtap="connectScannedServer">
+          <view class="server-main">
+            <text class="server-name">{{item.name}}</text>
+            <text class="server-ip">{{item.ip}}:{{item.port}}</text>
+          </view>
+          <view class="server-info-mini">
+            <text class="version">v{{item.version}}</text>
+            <text class="arrow">→</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="tips">
+        <text class="tip-title">扫描说明：</text>
+        <text class="tip-text">• 确保手机和服务器在同一WiFi</text>
+        <text class="tip-text">• 服务器需开启并监听8081端口</text>
+        <text class="tip-text">• 扫描可能需要1-2分钟</text>
+      </view>
+    </view>
+
+    <!-- 手动输入模式 -->
+    <view wx:else class="manual-mode">
+      <view class="input-group">
+        <text class="input-label">服务器IP地址 *</text>
+        <input 
+          class="input-field"
+          type="text"
+          placeholder="例如：192.168.1.100"
+          value="{{serverIp}}"
+          bindinput="onIpInput"
+        />
+      </view>
+
+      <view class="input-group">
+        <text class="input-label">端口</text>
+        <input 
+          class="input-field"
+          type="number"
+          placeholder="默认：8081"
+          value="{{serverPort}}"
+          bindinput="onPortInput"
+        />
+      </view>
+
+      <view class="input-group">
+        <text class="input-label">服务器名称（可选）</text>
+        <input 
+          class="input-field"
+          type="text"
+          placeholder="例如：我的智能眼镜"
+          value="{{serverName}}"
+          bindinput="onNameInput"
+        />
+      </view>
+
+      <button class="connect-btn" bindtap="connectManual">
+        连接服务器
+      </button>
+
+      <view class="tips">
+        <text class="tip-title">配置说明：</text>
+        <text class="tip-text">• 可在服务器运行 ipconfig 查看IP</text>
+        <text class="tip-text">• 默认端口为8081</text>
+        <text class="tip-text">• 支持局域网IP和公网域名</text>
+      </view>
+    </view>
+  </view>
+</view>

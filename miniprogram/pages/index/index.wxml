@@ -74,10 +74,10 @@
     <view wx:else class="no-device-section">
       <text class="no-device-icon">🔍</text>
       <text class="no-device-title">暂无设备连接</text>
-      <text class="no-device-subtitle">请添加您的智能眼镜设备</text>
-      <button class="add-device-from-empty" bindtap="addDevice">
+      <text class="no-device-subtitle">请通过蓝牙配对您的智能眼镜</text>
+      <button class="add-device-from-empty" bindtap="pairGlasses">
         <text class="btn-icon">+</text>
-        <text class="btn-text">添加设备</text>
+        <text class="btn-text">蓝牙配对</text>
       </button>
     </view>
 
@@ -86,6 +86,14 @@
       <text class="section-title">快速设置</text>
       
       <view class="action-grid">
+        <view class="action-item" bindtap="serverConfig">
+          <view class="action-icon-wrapper server-bg">
+            <text class="action-icon">🌐</text>
+          </view>
+          <text class="action-name">服务器</text>
+          <text class="action-desc">连接配置</text>
+        </view>
+
         <view class="action-item" bindtap="switchAIModel">
           <view class="action-icon-wrapper primary-bg">
             <text class="action-icon">🧠</text>

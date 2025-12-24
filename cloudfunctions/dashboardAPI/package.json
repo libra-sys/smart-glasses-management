@@ -1,0 +1,10 @@
+{
+  "name": "dashboardAPI",
+  "version": "1.0.0",
+  "description": "数据可视化大屏API接口",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "latest",
+    "node-fetch": "^2.6.7"
+  }
+}

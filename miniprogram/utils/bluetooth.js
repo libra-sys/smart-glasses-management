@@ -6,28 +6,42 @@
 class BluetoothManager {
   constructor() {
     this.deviceId = null;
+    this.serviceId = null;
     this.writeServiceId = null;
     this.writeCharacteristicId = null;
+    // 按功能区分的特征值（新版固件使用）
+    this.charVolumeId = null;
+    this.charPowerId = null;
+    this.charBatteryId = null;
+    this.charStatusId = null;
   }
 
   /**
    * 设置连接的设备信息
+   * 兼容老版本：前三个参数保持不变，第4个参数可选传入各功能特征值ID
    */
-  setDeviceInfo(deviceId, writeServiceId, writeCharacteristicId) {
+  setDeviceInfo(deviceId, writeServiceId, writeCharacteristicId, characteristicMap = {}) {
     this.deviceId = deviceId;
+    this.serviceId = writeServiceId;
     this.writeServiceId = writeServiceId;
     this.writeCharacteristicId = writeCharacteristicId;
+
+    this.charVolumeId = characteristicMap.charVolumeId || null;
+    this.charPowerId = characteristicMap.charPowerId || null;
+    this.charBatteryId = characteristicMap.charBatteryId || null;
+    this.charStatusId = characteristicMap.charStatusId || null;
+
     console.log('设置设备信息:', {
       deviceId,
       writeServiceId,
-      writeCharacteristicId
+      writeCharacteristicId,
+      characteristicMap
     });
   }
 
   /**
-   * 发送指令到设备
-   * @param {string} command - 指令字符串
-   * @param {object} options - 配置选项
+   * 发送指令到设备（旧协议：字符串/JSON 通道）
+   * 保留作为回退方案
    */
   sendCommand(command, options = {}) {
     return new Promise((resolve, reject) => {
@@ -99,6 +113,116 @@ class BluetoothManager {
   }
 
   /**
+   * 发送单字节到指定特征值（新版固件：音量/电源/电量等）
+   */
+  writeByteCharacteristic(characteristicId, value, options = {}) {
+    return new Promise((resolve, reject) => {
+      if (!this.deviceId || !this.serviceId || !characteristicId) {
+        const error = '蓝牙特征值未就绪';
+        console.error(error);
+        if (!options.silent) {
+          wx.showToast({
+            title: error,
+            icon: 'none'
+          });
+        }
+        reject(error);
+        return;
+      }
+
+      const buffer = new ArrayBuffer(1);
+      const view = new DataView(buffer);
+      view.setUint8(0, value & 0xff);
+
+      wx.writeBLECharacteristicValue({
+        deviceId: this.deviceId,
+        serviceId: this.serviceId,
+        characteristicId,
+        value: buffer,
+        success: () => {
+          console.log('写入成功 byte', value, '->', characteristicId);
+          resolve();
+        },
+        fail: (err) => {
+          console.error('写入失败:', err);
+          if (!options.silent) {
+            wx.showToast({
+              title: '发送失败',
+              icon: 'none'
+            });
+          }
+          reject(err);
+        }
+      });
+    });
+  }
+
+  /**
+   * 查询设备电量
+   */
+  getBattery() {
+    if (this.charBatteryId) {
+      // 直接读取电量特征值，具体解析在监听回调里处理
+      return new Promise((resolve, reject) => {
+        if (!this.deviceId || !this.serviceId) {
+          const error = '未连接设备';
+          console.error(error);
+          reject(error);
+          return;
+        }
+        wx.readBLECharacteristicValue({
+          deviceId: this.deviceId,
+          serviceId: this.serviceId,
+          characteristicId: this.charBatteryId,
+          success: resolve,
+          fail: reject
+        });
+      });
+    }
+    // 旧协议回退
+    return this.sendJSON({ cmd: 'GET_BATTERY' }, { silent: true });
+  }
+
+  /**
+   * 设备关机
+   */
+  powerOff() {
+    if (this.charPowerId) {
+      // 固件约定: 0 = 关机, 1 = 开机
+      return this.writeByteCharacteristic(this.charPowerId, 0);
+    }
+    // 旧协议回退
+    return this.sendJSON({ cmd: 'POWER_OFF' });
+  }
+
+  /**
+   * 设置音量 (0-100)
+   */
+  setVolume(value) {
+    const v = Math.max(0, Math.min(100, Number(value) || 0));
+    if (this.charVolumeId) {
+      return this.writeByteCharacteristic(this.charVolumeId, v);
+    }
+    // 旧协议回退
+    return this.sendJSON({ cmd: 'SET_VOLUME', value: v });
+  }
+
+  /**
+   * 设置亮度 (0-100)
+   */
+  setBrightness(value) {
+    const v = Math.max(0, Math.min(100, Number(value) || 0));
+    return this.sendJSON({ cmd: 'SET_BRIGHTNESS', value: v });
+  }
+
+  /**
+   * 查询设备状态
+   */
+  getStatus() {
+    return this.sendJSON({ cmd: 'GET_STATUS' }, { silent: true });
+  }
+
+  /**
    * 字符串转ArrayBuffer
    */
   str2ab(str) {
@@ -115,8 +239,13 @@ class BluetoothManager {
    */
   clear() {
     this.deviceId = null;
+    this.serviceId = null;
     this.writeServiceId = null;
     this.writeCharacteristicId = null;
+    this.charVolumeId = null;
+    this.charPowerId = null;
+    this.charBatteryId = null;
+    this.charStatusId = null;
   }
 }
 

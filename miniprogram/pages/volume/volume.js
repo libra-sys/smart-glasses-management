@@ -1,4 +1,6 @@
 // 音量控制页面
+const bluetoothManager = require('../../utils/bluetooth');
+
 Page({
   data: {
     masterVolume: 80,
@@ -30,16 +32,30 @@ Page({
 
   // 主音量变化
   masterVolumeChange(e) {
+    const volume = e.detail.value;
     this.setData({
-      masterVolume: e.detail.value
+      masterVolume: volume
     });
+    
+    // 发送BLE指令到ESP32
+    bluetoothManager.setVolume(volume)
+      .catch(err => {
+        console.log('设备未连接，音量仅保存到本地');
+      });
   },
 
   // 媒体音量变化
   mediaVolumeChange(e) {
+    const volume = e.detail.value;
     this.setData({
-      mediaVolume: e.detail.value
+      mediaVolume: volume
     });
+    
+    // 发送BLE指令
+    bluetoothManager.setVolume(volume)
+      .catch(err => {
+        console.log('设备未连接');
+      });
   },
 
   // 通话音量变化
@@ -93,10 +109,20 @@ Page({
     wx.setStorageSync('callVolume', callVolume);
     wx.setStorageSync('alertVolume', alertVolume);
 
-    wx.showToast({
-      title: '设置已保存',
-      icon: 'success'
-    });
+    // 最后再发送一次确保同步
+    bluetoothManager.setVolume(masterVolume)
+      .then(() => {
+        wx.showToast({
+          title: '设置已保存并同步',
+          icon: 'success'
+        });
+      })
+      .catch(() => {
+        wx.showToast({
+          title: '设置已保存',
+          icon: 'success'
+        });
+      });
 
     setTimeout(() => {
       wx.navigateBack();

@@ -38,7 +38,7 @@
     </view>
     
     <view class="component-list">
-      <view wx:for="{{installedComponents}}" wx:key="id" class="component-item">
+      <view wx:for="{{installedComponents}}" wx:key="id" class="component-item installed-item">
         <view class="component-icon" style="background-color: {{item.color}};">
           <text class="icon-emoji">{{item.icon}}</text>
         </view>
@@ -46,12 +46,50 @@
           <text class="component-name">{{item.name}}</text>
           <text class="component-desc">{{item.description}}</text>
         </view>
-        <switch 
-          checked="{{item.enabled}}" 
-          bindchange="toggleInstalledComponent"
-          data-index="{{index}}"
-          class="component-switch"
-        />
+        <view class="component-actions">
+          <switch 
+            checked="{{item.enabled}}" 
+            bindchange="toggleInstalledComponent"
+            data-index="{{index}}"
+            class="component-switch"
+          />
+          <button 
+            class="uninstall-btn"
+            bindtap="uninstallComponent"
+            data-index="{{index}}"
+          >
+            卸载
+          </button>
+        </view>
+      </view>
+    </view>
+
+    <!-- 导航助手地图导航 UI：仅当导航组件安装且启用时显示 -->
+    <view wx:if="{{navigationAvailable}}" class="nav-panel">
+      <view class="nav-panel-header">
+        <text class="nav-title">地图导航（实验）</text>
+        <text class="nav-subtitle">使用手机定位 + 腾讯地图</text>
+      </view>
+      <view class="nav-field">
+        <text class="nav-label">目的地名称</text>
+        <input class="nav-input" placeholder="例如：学校南门" value="{{navDestName}}" bindinput="onNavDestNameInput" />
+      </view>
+      <view class="nav-field-row">
+        <view class="nav-field half">
+          <text class="nav-label">纬度</text>
+          <input class="nav-input" placeholder="例如：31.2305" value="{{navDestLat}}" bindinput="onNavDestLatInput" />
+        </view>
+        <view class="nav-field half">
+          <text class="nav-label">经度</text>
+          <input class="nav-input" placeholder="例如：121.4737" value="{{navDestLng}}" bindinput="onNavDestLngInput" />
+        </view>
+      </view>
+      <view class="nav-actions">
+        <button class="nav-btn start" bindtap="startMapNavigation">开始地图导航</button>
+        <button class="nav-btn stop" bindtap="stopMapNavigation">停止</button>
+      </view>
+      <view wx:if="{{navStatusText}}" class="nav-status">
+        <text>{{navStatusText}}</text>
       </view>
     </view>
   </view>

@@ -20,6 +20,46 @@ Page({
   onLoad() {
     this.setGreetingTime();
     this.checkLoginStatus();
+    
+    // 临时测试：初始化数据库（只运行一次后删除）
+    // this.initDatabaseOnce();
+  },
+  
+  // 一键初始化数据库
+  initDatabaseOnce() {
+    wx.showLoading({ title: '初始化数据库...', mask: true });
+    
+    wx.cloud.callFunction({
+      name: 'initDatabase'
+    }).then(res => {
+      wx.hideLoading();
+      console.log('初始化结果:', res.result);
+      
+      if (res.result.success) {
+        wx.showModal({
+          title: '初始化成功',
+          content: '数据库已创建\n' + 
+                   res.result.results.map(r => 
+                     `${r.collection}: ${r.count || 1}条`
+                   ).join('\n'),
+          showCancel: false
+        });
+      } else {
+        wx.showModal({
+          title: '初始化失败',
+          content: res.result.error,
+          showCancel: false
+        });
+      }
+    }).catch(err => {
+      wx.hideLoading();
+      console.error('初始化失败:', err);
+      wx.showModal({
+        title: '错误',
+        content: err.errMsg,
+        showCancel: false
+      });
+    });
   },
   
   // 检查登录状态
@@ -130,9 +170,8 @@ Page({
         }
       });
     } else {
-      // 没有电量服务，使用模拟值
-      const battery = Math.floor(Math.random() * 40) + 60; // 60-100的随机值
-      this.setData({ deviceBattery: battery });
+      // 没有电量服务，从云数据库读取
+      this.loadDeviceBatteryFromDB(deviceId);
     }
   },
   
@@ -157,6 +196,12 @@ Page({
   /**
    * 跳转到添加设备页面
    */
+  pairGlasses() {
+    wx.navigateTo({
+      url: '/pages/pairing/pairing'
+    });
+  },
+  
   // 点击用户头像
   handleUserClick() {
     const isLoggedIn = this.data.isLoggedIn;
@@ -286,6 +331,15 @@ Page({
   },
   
   /**
+   * 跳转到服务器配置页面
+   */
+  serverConfig() {
+    wx.navigateTo({
+      url: '/pages/server-config/server-config'
+    });
+  },
+
+  /**
    * 跳转到AI模型管理页面
    * @description 导航至AI模型管理页面，用于配置API参数和切换模型
    */
@@ -305,6 +359,37 @@ Page({
     });
   },
 
+  /**
+   * 从云数据库加载设备电量
+   */
+  loadDeviceBatteryFromDB(deviceId) {
+    const db = wx.cloud.database();
+    const shortId = deviceId.slice(-4).toUpperCase(); // 取设备ID后4位
+    
+    // 查找匹配的设备
+    db.collection('devices')
+      .where({
+        _id: db.RegExp({
+          regexp: shortId,
+          options: 'i'
+        })
+      })
+      .get()
+      .then(res => {
+        if (res.data.length > 0) {
+          const device = res.data[0];
+          this.setData({ deviceBattery: device.battery || 85 });
+          console.log('从云数据库加载电量:', device.battery);
+        } else {
+          this.setData({ deviceBattery: 85 }); // 默认值
+        }
+      })
+      .catch(err => {
+        console.error('加载电量失败:', err);
+        this.setData({ deviceBattery: 85 }); // 默认值
+      });
+  },
+  
   /**
    * 页面显示时执行
    * @description 页面每次显示时从本地存储加载AI模式状态

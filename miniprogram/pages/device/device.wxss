@@ -152,6 +152,26 @@
 .device-controls {
   width: 100%;
   margin-top: 16rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.control-btn {
+  width: 100%;
+  padding: 18rpx;
+  background: #FFFFFF;
+  border: 2rpx solid #007AFF;
+  border-radius: 14rpx;
+  color: #007AFF;
+  font-size: 26rpx;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.control-btn:active {
+  background: #007AFF;
+  color: #FFFFFF;
 }
 
 .ai-toggle-btn {

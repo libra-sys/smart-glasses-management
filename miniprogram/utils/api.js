@@ -23,24 +23,37 @@ console.log('BASE_URL:', BASE_URL);
  */
 function request(options) {
   return new Promise((resolve, reject) => {
+    const url = BASE_URL + options.url;
+    const isPost = options.method === 'POST';
+    const requestData = isPost ? JSON.stringify(options.data || {}) : (options.data || {});
+    
+    console.log('发起请求:', url, options.method, requestData);
+    
     wx.request({
-      url: BASE_URL + options.url,
+      url: url,
       method: options.method || 'GET',
-      data: options.data || {},
+      data: requestData,
+      timeout: 10000,
       header: {
-        'Content-Type': 'application/json',
+        'Content-Type': isPost ? 'application/json' : 'application/x-www-form-urlencoded',
         ...options.header
       },
       success: (res) => {
+        console.log('请求成功:', url, res.statusCode, res.data);
         if (res.statusCode === 200) {
           resolve(res.data);
         } else {
-          reject(new Error(`请求失败: ${res.statusCode}`));
+          const error = new Error(`请求失败: ${res.statusCode}`);
+          error.statusCode = res.statusCode;
+          error.data = res.data;
+          reject(error);
         }
       },
       fail: (err) => {
-        console.error('网络请求失败:', err);
-        reject(err);
+        console.error('网络请求失败:', url, err);
+        const error = new Error(err.errMsg || '网络请求失败');
+        error.originalError = err;
+        reject(error);
       }
     });
   });
@@ -97,6 +110,73 @@ const ComponentAPI = {
  * 用户API
  */
 const UserAPI = {
+  // 登录
+  login(email, password) {
+    return request({
+      url: '/api/miniapp-auth',
+      method: 'POST',
+      data: {
+        action: 'login',
+        email: email,
+        password: password
+      }
+    });
+  },
+
+  // 注册
+  register(email, password, username) {
+    return request({
+      url: '/api/miniapp-auth',
+      method: 'POST',
+      data: {
+        action: 'register',
+        email: email,
+        password: password,
+        username: username
+      }
+    });
+  },
+
+  // 微信登录
+  wechatLogin(code, nickName, avatarUrl) {
+    return request({
+      url: '/api/miniapp-auth',
+      method: 'POST',
+      data: {
+        action: 'wechat-login',
+        code: code,
+        nickName: nickName,
+        avatarUrl: avatarUrl
+      }
+    });
+  },
+
+  // 获取用户已安装组件
+  getUserComponents(userId) {
+    return request({
+      url: '/api/user-components',
+      method: 'GET',
+      data: { userId }
+    });
+  },
+
+  // 安装组件到用户账户
+  installComponent(userId, componentId) {
+    return request({
+      url: '/api/user-components',
+      method: 'POST',
+      data: { userId, componentId }
+    });
+  },
+
+  // 卸载用户组件
+  uninstallComponent(userId, componentId) {
+    return request({
+      url: `/api/user-components?userId=${userId}&componentId=${componentId}`,
+      method: 'DELETE'
+    });
+  },
+
   // 上传组件（用户发布）
   uploadComponent(data) {
     return request({
@@ -115,9 +195,91 @@ const UserAPI = {
   }
 };
 
+/**
+ * 眼镜设备API（智能功能通过服务器）
+ */
+const GlassesAPI = {
+  // 切换AI模型
+  switchAIModel(deviceId, model, config = {}) {
+    return request({
+      url: '/api/glasses/ai-model',
+      method: 'POST',
+      data: {
+        deviceId,
+        model,
+        ...config
+      }
+    });
+  },
+
+  // 发起导航
+  startNavigation(deviceId, destination) {
+    return request({
+      url: '/api/glasses/navigation',
+      method: 'POST',
+      data: {
+        deviceId,
+        destination
+      }
+    });
+  },
+
+  // 安装社区组件（通过服务器推送到ESP32）
+  installComponentToGlasses(deviceId, componentId, userId) {
+    return request({
+      url: '/api/glasses/install-component',
+      method: 'POST',
+      data: {
+        deviceId,
+        componentId,
+        userId
+      }
+    });
+  },
+
+  // 语音助手对话
+  voiceAssistant(deviceId, audioData, language = 'zh-CN') {
+    return request({
+      url: '/api/glasses/voice-assistant',
+      method: 'POST',
+      data: {
+        deviceId,
+        audioData,
+        language
+      }
+    });
+  },
+
+  // 物体识别
+  objectRecognition(deviceId, imageData) {
+    return request({
+      url: '/api/glasses/object-recognition',
+      method: 'POST',
+      data: {
+        deviceId,
+        imageData
+      }
+    });
+  },
+
+  // 实时翻译
+  translate(deviceId, text, targetLang) {
+    return request({
+      url: '/api/glasses/translate',
+      method: 'POST',
+      data: {
+        deviceId,
+        text,
+        targetLang
+      }
+    });
+  }
+};
+
 module.exports = {
   BASE_URL,
   request,
   ComponentAPI,
-  UserAPI
+  UserAPI,
+  GlassesAPI
 };

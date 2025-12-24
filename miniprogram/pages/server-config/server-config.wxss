@@ -1,0 +1,304 @@
+.container {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding: 30rpx;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 40rpx;
+}
+
+.title {
+  display: block;
+  font-size: 40rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10rpx;
+}
+
+.subtitle {
+  display: block;
+  font-size: 26rpx;
+  color: #999;
+}
+
+/* 已连接状态 */
+.connected-section {
+  background: white;
+  border-radius: 20rpx;
+  padding: 40rpx;
+}
+
+.status-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20rpx;
+  border-radius: 12rpx;
+  margin-bottom: 30rpx;
+}
+
+.status-badge.success {
+  background: #e8f5e9;
+}
+
+.badge-icon {
+  font-size: 32rpx;
+  margin-right: 10rpx;
+}
+
+.badge-text {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #4caf50;
+}
+
+.server-info {
+  margin-bottom: 30rpx;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 25rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-row .label {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.info-row .value {
+  font-size: 28rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.actions {
+  display: flex;
+  gap: 20rpx;
+}
+
+.action-btn {
+  flex: 1;
+  height: 80rpx;
+  line-height: 80rpx;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  border: none;
+}
+
+.test-btn {
+  background: #2196f3;
+  color: white;
+}
+
+.disconnect-btn {
+  background: #ff5722;
+  color: white;
+}
+
+/* 配置区域 */
+.config-section {
+  background: white;
+  border-radius: 20rpx;
+  padding: 30rpx;
+}
+
+.mode-tabs {
+  display: flex;
+  background: #f5f5f5;
+  border-radius: 12rpx;
+  padding: 8rpx;
+  margin-bottom: 30rpx;
+}
+
+.tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20rpx;
+  border-radius: 8rpx;
+  transition: all 0.3s;
+}
+
+.tab.active {
+  background: white;
+  box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.1);
+}
+
+.tab-icon {
+  font-size: 36rpx;
+  margin-bottom: 8rpx;
+}
+
+.tab-text {
+  font-size: 26rpx;
+  color: #666;
+}
+
+.tab.active .tab-text {
+  color: #2196f3;
+  font-weight: bold;
+}
+
+/* 扫描模式 */
+.scan-mode {
+  padding: 20rpx 0;
+}
+
+.scan-btn {
+  width: 100%;
+  height: 88rpx;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 12rpx;
+  font-size: 30rpx;
+  font-weight: bold;
+  border: none;
+  margin-bottom: 30rpx;
+}
+
+.scan-btn[disabled] {
+  opacity: 0.6;
+}
+
+.server-list {
+  margin-bottom: 30rpx;
+}
+
+.list-title {
+  display: block;
+  font-size: 26rpx;
+  color: #999;
+  margin-bottom: 20rpx;
+}
+
+.server-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 25rpx;
+  background: #f9f9f9;
+  border-radius: 12rpx;
+  margin-bottom: 15rpx;
+}
+
+.server-item:active {
+  background: #f0f0f0;
+}
+
+.server-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.server-name {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.server-ip {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.server-info-mini {
+  display: flex;
+  align-items: center;
+  gap: 15rpx;
+}
+
+.version {
+  font-size: 24rpx;
+  color: #2196f3;
+  background: #e3f2fd;
+  padding: 6rpx 12rpx;
+  border-radius: 6rpx;
+}
+
+.arrow {
+  font-size: 28rpx;
+  color: #999;
+}
+
+/* 手动输入模式 */
+.manual-mode {
+  padding: 20rpx 0;
+}
+
+.input-group {
+  margin-bottom: 30rpx;
+}
+
+.input-label {
+  display: block;
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 15rpx;
+}
+
+.input-field {
+  width: 100%;
+  height: 80rpx;
+  padding: 0 25rpx;
+  background: #f9f9f9;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  border: 2rpx solid #f0f0f0;
+}
+
+.input-field:focus {
+  border-color: #2196f3;
+  background: white;
+}
+
+.connect-btn {
+  width: 100%;
+  height: 88rpx;
+  background: #4caf50;
+  color: white;
+  border-radius: 12rpx;
+  font-size: 30rpx;
+  font-weight: bold;
+  border: none;
+  margin-bottom: 30rpx;
+}
+
+/* 提示信息 */
+.tips {
+  background: #fff9e6;
+  border-radius: 12rpx;
+  padding: 25rpx;
+  border-left: 4rpx solid #ffc107;
+}
+
+.tip-title {
+  display: block;
+  font-size: 26rpx;
+  font-weight: bold;
+  color: #f57c00;
+  margin-bottom: 15rpx;
+}
+
+.tip-text {
+  display: block;
+  font-size: 24rpx;
+  color: #666;
+  line-height: 40rpx;
+  margin-bottom: 8rpx;
+}
+
+.tip-text:last-child {
+  margin-bottom: 0;
+}

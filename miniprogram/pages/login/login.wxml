@@ -32,8 +32,8 @@
     <!-- 登录表单 -->
     <view wx:if="{{isLogin}}" class="form-container">
       <view class="input-group">
-        <view class="input-icon">📱</view>
-        <input class="input-field" type="text" placeholder="请输入手机号" value="{{phone}}" bindinput="onPhoneInput" />
+        <view class="input-icon">📧</view>
+        <input class="input-field" type="text" placeholder="请输入邮箱或手机号" value="{{email}}" bindinput="onEmailInput" />
       </view>
       <view class="input-group">
         <view class="input-icon">🔒</view>
@@ -52,8 +52,8 @@
         <input class="input-field" type="text" placeholder="请输入用户名" value="{{username}}" bindinput="onUsernameInput" />
       </view>
       <view class="input-group">
-        <view class="input-icon">📱</view>
-        <input class="input-field" type="text" placeholder="请输入手机号" value="{{phone}}" bindinput="onPhoneInput" />
+        <view class="input-icon">📧</view>
+        <input class="input-field" type="text" placeholder="请输入邮箱或手机号" value="{{email}}" bindinput="onEmailInput" />
       </view>
       <view class="input-group">
         <view class="input-icon">🔒</view>

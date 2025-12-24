@@ -80,9 +80,55 @@ Page({
 
   // 编辑个人信息
   editProfile() {
-    wx.showToast({
-      title: '功能开发中',
-      icon: 'none'
+    wx.showModal({
+      title: '修改昵称',
+      editable: true,
+      placeholderText: '请输入新的昵称',
+      content: this.data.userInfo.username || '',
+      success: (res) => {
+        if (res.confirm && res.content) {
+          const newUsername = res.content.trim();
+          if (newUsername) {
+            const updatedUserInfo = {
+              ...this.data.userInfo,
+              username: newUsername
+            };
+            
+            this.setData({ userInfo: updatedUserInfo });
+            wx.setStorageSync('userInfo', updatedUserInfo);
+            
+            wx.showToast({
+              title: '修改成功',
+              icon: 'success'
+            });
+          }
+        }
+      }
+    });
+  },
+
+  // 修改头像
+  changeAvatar() {
+    wx.chooseMedia({
+      count: 1,
+      mediaType: ['image'],
+      sourceType: ['album', 'camera'],
+      success: (res) => {
+        const tempFilePath = res.tempFiles[0].tempFilePath;
+        
+        const updatedUserInfo = {
+          ...this.data.userInfo,
+          avatar: tempFilePath
+        };
+        
+        this.setData({ userInfo: updatedUserInfo });
+        wx.setStorageSync('userInfo', updatedUserInfo);
+        
+        wx.showToast({
+          title: '头像修改成功',
+          icon: 'success'
+        });
+      }
     });
   },
 

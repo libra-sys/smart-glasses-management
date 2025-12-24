@@ -6,10 +6,13 @@
     "pages/model/model",
     "pages/aimodel/aimodel",
     "pages/example/index",
+    "pages/sync/sync",
+    "pages/pairing/pairing",
     "pages/settings/settings",
     "pages/sound/sound",
     "pages/extension/extension",
-    "pages/volume/volume"
+    "pages/volume/volume",
+    "pages/server-config/server-config"
   ],
   "window": {
     "backgroundColor": "#F2F2F7",
@@ -21,6 +24,14 @@
   "sitemapLocation": "sitemap.json",
   "style": "v2",
   "lazyCodeLoading": "requiredComponents",
+  "permission": {
+    "scope.userLocation": {
+      "desc": "用于导航功能，将手机位置上报到眼镜服务器"
+    }
+  },
+  "requiredPrivateInfos": [
+    "getLocation"
+  ],
   "tabBar": {
     "color": "#8E8E93",
     "selectedColor": "#007AFF",

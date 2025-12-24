@@ -8,6 +8,91 @@ page {
   padding-bottom: 100rpx;
 }
 
+/* 地图导航面板 */
+.nav-panel {
+  margin: 24rpx 32rpx 0;
+  padding: 24rpx 28rpx;
+  background-color: #ffffff;
+  border-radius: 24rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.06);
+}
+
+.nav-panel-header {
+  margin-bottom: 20rpx;
+}
+
+.nav-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #000;
+}
+
+.nav-subtitle {
+  margin-top: 6rpx;
+  font-size: 22rpx;
+  color: #8E8E93;
+}
+
+.nav-field {
+  margin-top: 12rpx;
+}
+
+.nav-field-row {
+  display: flex;
+  gap: 20rpx;
+  margin-top: 12rpx;
+}
+
+.nav-field.half {
+  flex: 1;
+}
+
+.nav-label {
+  font-size: 24rpx;
+  color: #8E8E93;
+  margin-bottom: 6rpx;
+  display: block;
+}
+
+.nav-input {
+  background-color: #F2F2F7;
+  border-radius: 16rpx;
+  padding: 12rpx 20rpx;
+  font-size: 26rpx;
+}
+
+.nav-actions {
+  display: flex;
+  gap: 20rpx;
+  margin-top: 20rpx;
+}
+
+.nav-btn {
+  flex: 1;
+  font-size: 26rpx;
+  border-radius: 20rpx;
+}
+
+.nav-btn.start {
+  background-color: #007AFF;
+  color: #fff;
+}
+
+.nav-btn.stop {
+  background-color: #E5E5EA;
+  color: #000;
+}
+
+.nav-btn::after {
+  border: none;
+}
+
+.nav-status {
+  margin-top: 16rpx;
+  font-size: 24rpx;
+  color: #8E8E93;
+}
+
 /* 顶部导航栏 */
 .header {
   background-color: #fff;
@@ -153,6 +238,35 @@ page {
 /* 开关 */
 .component-switch {
   transform: scale(0.9);
+}
+
+/* 已安装组件操作区 */
+.installed-item .component-info {
+  flex: 1;
+  margin-right: 20rpx;
+}
+
+.component-actions {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+/* 卸载按钮 */
+.uninstall-btn {
+  background-color: #FF3B30;
+  color: #fff;
+  font-size: 24rpx;
+  font-weight: 500;
+  padding: 10rpx 24rpx;
+  border-radius: 16rpx;
+  border: none;
+  line-height: 1;
+  min-width: 100rpx;
+}
+
+.uninstall-btn::after {
+  border: none;
 }
 
 /* 安装按钮 */

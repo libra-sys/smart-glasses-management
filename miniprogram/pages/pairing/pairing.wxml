@@ -1,0 +1,72 @@
+<view class="container">
+  <view class="header">
+    <text class="title">智能眼镜配对</text>
+  </view>
+
+  <view wx:if="{{!connectedDevice}}" class="scan-section">
+    <button 
+      type="primary" 
+      bindtap="startScan" 
+      loading="{{scanning}}"
+      disabled="{{scanning}}">
+      {{scanning ? '扫描中...' : '开始扫描'}}
+    </button>
+
+    <view wx:if="{{devices.length > 0}}" class="device-list">
+      <text class="list-title">发现的设备</text>
+      <view 
+        wx:for="{{devices}}" 
+        wx:key="deviceId" 
+        class="device-item"
+        bindtap="connectDevice"
+        data-device="{{item}}">
+        <view class="device-info">
+          <text class="device-name">{{item.name}}</text>
+          <text class="device-id">ID: {{item.deviceId}}</text>
+        </view>
+        <view class="device-rssi">
+          <text>{{item.rssi}} dBm</text>
+        </view>
+      </view>
+    </view>
+
+    <view wx:else class="empty-tip">
+      <text>点击上方按钮扫描附近的智能眼镜</text>
+    </view>
+  </view>
+
+  <view wx:else class="connected-section">
+    <view class="status-card">
+      <view class="status-icon">✓</view>
+      <text class="status-text">已连接</text>
+    </view>
+
+    <view class="device-detail">
+      <view class="detail-item">
+        <text class="label">设备名称:</text>
+        <text class="value">{{connectedDevice.name}}</text>
+      </view>
+      <view class="detail-item">
+        <text class="label">设备ID:</text>
+        <text class="value">{{connectedDevice.deviceId}}</text>
+      </view>
+      <view wx:if="{{batteryLevel}}" class="detail-item">
+        <text class="label">电池电量:</text>
+        <text class="value">{{batteryLevel}}%</text>
+      </view>
+    </view>
+
+    <button 
+      type="warn" 
+      bindtap="disconnectDevice">
+      断开连接
+    </button>
+  </view>
+
+  <view class="tips">
+    <text class="tip-title">配对说明：</text>
+    <text class="tip-text">• 确保眼镜已开机且蓝牙已打开</text>
+    <text class="tip-text">• 眼镜名称通常包含 "AIglasses" 或 "ESP32"</text>
+    <text class="tip-text">• 配对成功后可在首页控制眼镜功能</text>
+  </view>
+</view>
