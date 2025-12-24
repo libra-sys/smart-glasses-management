@@ -250,9 +250,17 @@ Page({
 
     // 开始搜索
     wx.startBluetoothDevicesDiscovery({
-      allowDuplicatesKey: false,
+      allowDuplicatesKey: true,  // 允许重复上报,提高发现率
+      interval: 0,  // 上报间隔,0表示尽可能频繁上报
       success: () => {
         console.log('开始搜索蓝牙设备...');
+        
+        // 监听设备发现事件
+        wx.onBluetoothDeviceFound((res) => {
+          console.log('发现新设备:', res.devices);
+          // 立即更新设备列表
+          updateDeviceList();
+        });
                 
         // 先更新一次系统设备列表
         this.loadSystemPairedDevices();

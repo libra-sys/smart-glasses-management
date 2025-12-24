@@ -212,9 +212,22 @@ void initBLE() {
   pAdvertising->setScanResponse(true);
   pAdvertising->setMinPreferred(0x06);
   pAdvertising->setMinPreferred(0x12);
+  
+  // 增强广播可见性
+  BLEAdvertisementData advertisementData;
+  advertisementData.setFlags(0x06); // BR_EDR_NOT_SUPPORTED | GENERAL_DISC_MODE
+  advertisementData.setCompleteServices(BLEUUID(BLE_SERVICE_UUID));
+  advertisementData.setName("AIGlasses-ESP32");
+  pAdvertising->setAdvertisementData(advertisementData);
+  
+  BLEAdvertisementData scanResponseData;
+  scanResponseData.setName("AIGlasses-ESP32");
+  pAdvertising->setScanResponseData(scanResponseData);
+  
   BLEDevice::startAdvertising();
   
   Serial.println("[BLE] Service started, advertising...");
+  Serial.println("[BLE] Device Name: AIGlasses-ESP32");
 }
 
 void updateBLEBattery(uint8_t level) {
