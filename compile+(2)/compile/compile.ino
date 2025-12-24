@@ -290,21 +290,21 @@ bool init_camera() {
     s->set_vflip(s, 0);    // ★ 新增:垂直翻转;若镜头"倒装",改为 1
   
     // === OV3660专用优化配置 ===
-    s->set_brightness(s, 0);
-    s->set_contrast(s, 0);     // 降低对比度减少处理开销
-    s->set_saturation(s, -1);  // 降低饱和度减少处理开销
-    s->set_gain_ctrl(s, 1);    // 启用自动增益
-    s->set_exposure_ctrl(s, 1);// 启用自动曝光
-    s->set_whitebal(s, 1);     // 启用自动白平衡
-    s->set_awb_gain(s, 1);     // 启用自动白平衡增益
-    s->set_aec2(s, 1);         // 启用高级自动曝光控制
-    s->set_aec_value(s, 300);  // 设置曝光值(降低以提高帧率)
-    s->set_agc_gain(s, 0);     // 手动AGC增益(0=自动)
-    s->set_gainceiling(s, (gainceiling_t)2); // 增益上限设为2x
-    s->set_raw_gma(s, 1);      // 启用Gamma校正
-    s->set_lenc(s, 1);         // 启用镜头校正
-    s->set_dcw(s, 1);          // 启用下采样
-    s->set_colorbar(s, 0);     // 禁用测试图案
+    s->set_brightness(s, 1);     // 提高亮度(范围:-2到+2)
+    s->set_contrast(s, 1);       // 恢复对比度
+    s->set_saturation(s, 0);     // 正常饱和度
+    s->set_gain_ctrl(s, 1);      // 启用自动增益
+    s->set_exposure_ctrl(s, 1);  // 启用自动曝光
+    s->set_whitebal(s, 1);       // 启用自动白平衡
+    s->set_awb_gain(s, 1);       // 启用自动白平衡增益
+    s->set_aec2(s, 1);           // 启用高级自动曝光控制
+    s->set_aec_value(s, 600);    // 提高曝光值到600(增加亮度)
+    s->set_agc_gain(s, 0);       // 自动AGC增益
+    s->set_gainceiling(s, (gainceiling_t)6); // 增益上限提高到6x(更好的低光表现)
+    s->set_raw_gma(s, 1);        // 启用Gamma校正
+    s->set_lenc(s, 1);           // 启用镜头校正
+    s->set_dcw(s, 1);            // 启用下采样
+    s->set_colorbar(s, 0);       // 禁用测试图案
     s->set_special_effect(s, 0); // 无特效
       
     Serial.println("[CAM] OV3660 optimized config applied");
