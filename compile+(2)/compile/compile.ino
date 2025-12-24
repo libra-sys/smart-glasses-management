@@ -811,7 +811,9 @@ void taskHttpPlay(void*){
       if (filled == 0) { vTaskDelay(pdMS_TO_TICKS(1)); continue; }
 
       size_t samp = filled / 2;
-      mono16_to_stereo32_msb((const int16_t*)inbuf, samp, outLR, 0.8f);
+      // 应用BLE音量控制: current_volume (0-100) -> gain (0.0-1.0)
+      float volume_gain = (float)current_volume / 100.0f;
+      mono16_to_stereo32_msb((const int16_t*)inbuf, samp, outLR, volume_gain);
 
       size_t bytes = samp * 2 * sizeof(int32_t);
       size_t off = 0;
@@ -856,9 +858,10 @@ void taskTTSPlay(void*){
       size_t inSamp  = ch.n / 2;
       int16_t* inPtr = (int16_t*)ch.data;
       size_t outPairs = 0;
+      // 应用BLE音量控制
+      float volume_gain = (float)current_volume / 100.0f;
       for (size_t i = 0; i < inSamp; ++i){
-        int32_t s = (int32_t)inPtr[i];
-        s = (s * 19660) / 32768;
+        int32_t s = (int32_t)((float)inPtr[i] * volume_gain);
         int32_t v32 = s << 16;
         stereo32Buf[outPairs*2 + 0] = v32;
         stereo32Buf[outPairs*2 + 1] = v32;
