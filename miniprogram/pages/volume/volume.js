@@ -13,6 +13,11 @@ Page({
     this.loadVolumeSettings();
   },
 
+  onShow() {
+    // 页面显示时重新加载设置
+    this.loadVolumeSettings();
+  },
+
   // 加载音量设置
   loadVolumeSettings() {
     const masterVolume = wx.getStorageSync('masterVolume');

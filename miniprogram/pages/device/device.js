@@ -511,14 +511,26 @@ Page({
           // 查找可写特征值 (用于发送指令)
           if (properties.write || properties.writeNoResponse) {
             console.log('找到可写特征值:', uuid, '服务:', serviceId);
-            // 保存第一个可写特征值
+            
+            // 检查是否是音量特征值
+            if (uuid.includes('BEB5483E-36E1-4688-B7F5-EA07361B26A8')) {
+              console.log('找到音量特征值:', uuid);
+              bluetoothManager.charVolumeId = characteristic.uuid;
+            }
+            // 检查是否是电源特征值
+            else if (uuid.includes('BEB5483E-36E1-4688-B7F5-EA07361B26A9')) {
+              console.log('找到电源特征值:', uuid);
+              bluetoothManager.charPowerId = characteristic.uuid;
+            }
+            
+            // 保存第一个可写特征值作为通用写入通道
             if (!this.data.writeCharacteristicId) {
               this.setData({
                 writeServiceId: serviceId,
                 writeCharacteristicId: characteristic.uuid
               });
               
-              // 同时设置到蓝牙管理器
+              // 设置蓝牙管理器基础信息
               const deviceId = this.data.connectedDevice?.deviceId;
               if (deviceId) {
                 bluetoothManager.setDeviceInfo(
@@ -538,8 +550,16 @@ Page({
           // 查找可通知特征值 (用于接收设备数据)
           if (properties.notify || properties.indicate) {
             console.log('找到可通知特征值:', uuid, '服务:', serviceId);
-            // 保存第一个可通知特征值
-            if (!this.data.notifyCharacteristicId && !uuid.includes('2A19')) {
+            
+            // 检查是否是电量特征值
+            if (uuid.includes('BEB5483E-36E1-4688-B7F5-EA07361B26AA')) {
+              console.log('找到电量通知特征值:', uuid);
+              bluetoothManager.charBatteryId = characteristic.uuid;
+              // 启用电量通知
+              this.enableNotification(deviceId, serviceId, characteristic.uuid);
+            }
+            // 保存第一个可通知特征值(排除电量特征值)
+            else if (!this.data.notifyCharacteristicId && !uuid.includes('2A19')) {
               this.setData({
                 notifyServiceId: serviceId,
                 notifyCharacteristicId: characteristic.uuid

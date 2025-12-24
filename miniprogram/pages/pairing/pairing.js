@@ -46,7 +46,7 @@ Page({
   },
 
   loadConnectedDevice() {
-    const device = wx.getStorageSync('connectedGlasses');
+    const device = wx.getStorageSync('pairedDevice');
     if (device) {
       this.setData({ connectedDevice: device });
     }
@@ -284,14 +284,17 @@ Page({
   saveConnection(device, serviceId, writeCharId, notifyCharId) {
     const connectionInfo = {
       deviceId: device.deviceId,
-      name: device.name,
+      deviceName: device.name,
+      model: 'AI智能眼镜',
+      battery: this.data.batteryLevel || 85,
       serviceId,
       writeCharId,
       notifyCharId,
       connectedAt: new Date().toISOString()
     };
     
-    wx.setStorageSync('connectedGlasses', connectionInfo);
+    // 与其他页面保持一致，使用 pairedDevice
+    wx.setStorageSync('pairedDevice', connectionInfo);
   },
 
   disconnectDevice() {
@@ -301,7 +304,7 @@ Page({
       deviceId: this.data.connectedDevice.deviceId,
       success: () => {
         bluetoothManager.clear();
-        wx.removeStorageSync('connectedGlasses');
+        wx.removeStorageSync('pairedDevice');
         this.setData({ 
           connectedDevice: null,
           batteryLevel: null
