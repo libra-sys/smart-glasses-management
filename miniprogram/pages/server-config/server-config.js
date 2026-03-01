@@ -87,7 +87,7 @@ Page({
     return new Promise((resolve) => {
       wx.request({
         url: `http://${ip}:8081/api/miniapp/discover`,
-        timeout: 800,
+        timeout: 2000,  // 延长到2秒，提高扫描成功率
         success: (res) => {
           if (res.data && res.data.service === 'AIGlasses Server') {
             console.log('发现服务器:', ip, res.data);

@@ -326,3 +326,110 @@ page {
 .component-item.community:active {
   background-color: #F0F0F0;
 }
+
+/* 地图搜索样式 */
+.nav-field {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+  margin-top: 20rpx;
+}
+
+.select-location-btn {
+  background-color: #F2F2F7;
+  color: #007AFF;
+  font-size: 28rpx;
+  padding: 24rpx 32rpx;
+  border-radius: 16rpx;
+  border: 2rpx dashed #007AFF;
+  text-align: center;
+}
+
+.select-location-btn::after {
+  border: none;
+}
+
+/* 搜索结果列表 */
+.search-results {
+  margin-top: 16rpx;
+  background-color: #F8F8F8;
+  border-radius: 16rpx;
+  overflow: hidden;
+  max-height: 400rpx;
+  overflow-y: auto;
+}
+
+.result-item {
+  padding: 20rpx 24rpx;
+  border-bottom: 1rpx solid #E5E5EA;
+  transition: background-color 0.2s;
+}
+
+.result-item:last-child {
+  border-bottom: none;
+}
+
+.result-item:active {
+  background-color: #E5E5EA;
+}
+
+.result-name {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #000;
+  margin-bottom: 6rpx;
+}
+
+.result-address {
+  font-size: 22rpx;
+  color: #8E8E93;
+}
+
+/* 已选目的地 */
+.selected-dest {
+  margin-top: 16rpx;
+  padding: 20rpx 24rpx;
+  background-color: #E3F2FD;
+  border-radius: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dest-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+}
+
+.dest-name {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: #007AFF;
+}
+
+.dest-coord {
+  font-size: 22rpx;
+  color: #8E8E93;
+}
+
+.clear-btn {
+  background-color: #FF3B30;
+  color: #fff;
+  font-size: 22rpx;
+  padding: 10rpx 20rpx;
+  border-radius: 12rpx;
+  border: none;
+  line-height: 1;
+}
+
+.clear-btn::after {
+  border: none;
+}
+
+/* 禁用按钮样式 */
+.nav-btn[disabled] {
+  opacity: 0.4;
+}

@@ -70,24 +70,37 @@
         <text class="nav-title">地图导航（实验）</text>
         <text class="nav-subtitle">使用手机定位 + 腾讯地图</text>
       </view>
+      
+      <!-- 选择地点按钮 -->
       <view class="nav-field">
-        <text class="nav-label">目的地名称</text>
-        <input class="nav-input" placeholder="例如：学校南门" value="{{navDestName}}" bindinput="onNavDestNameInput" />
+        <text class="nav-label">📍 目的地</text>
+        <button class="select-location-btn" bindtap="searchLocation">
+          {{navDestName || '点击选择目的地'}}
+        </button>
       </view>
-      <view class="nav-field-row">
-        <view class="nav-field half">
-          <text class="nav-label">纬度</text>
-          <input class="nav-input" placeholder="例如：31.2305" value="{{navDestLat}}" bindinput="onNavDestLatInput" />
+
+      <!-- 已选目的地详情 -->
+      <view wx:if="{{navDestName}}" class="selected-dest">
+        <view class="dest-info">
+          <text class="dest-name">✅ {{navDestName}}</text>
+          <text class="dest-coord">{{navDestLat}}, {{navDestLng}}</text>
         </view>
-        <view class="nav-field half">
-          <text class="nav-label">经度</text>
-          <input class="nav-input" placeholder="例如：121.4737" value="{{navDestLng}}" bindinput="onNavDestLngInput" />
-        </view>
+        <button class="clear-btn" bindtap="clearDestination">清除</button>
       </view>
+
+      <!-- 导航控制按钮 -->
       <view class="nav-actions">
-        <button class="nav-btn start" bindtap="startMapNavigation">开始地图导航</button>
+        <button 
+          class="nav-btn start" 
+          bindtap="startMapNavigation"
+          disabled="{{!navDestName}}"
+        >
+          开始导航
+        </button>
         <button class="nav-btn stop" bindtap="stopMapNavigation">停止</button>
       </view>
+      
+      <!-- 导航状态 -->
       <view wx:if="{{navStatusText}}" class="nav-status">
         <text>{{navStatusText}}</text>
       </view>

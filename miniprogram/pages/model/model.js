@@ -64,10 +64,12 @@ Page({
     syncTimer: null,  // 同步定时器
     locationTimer: null,  // 定位上报定时器
     navigationAvailable: false,  // 导航组件已安装且启用时为 true
-    navDestName: '',
-    navDestLat: '',
-    navDestLng: '',
-    navStatusText: ''
+    navSearchKeyword: '',  // 搜索关键词
+    navSearchResults: [],  // 搜索结果列表
+    navDestName: '',  // 已选目的地名称
+    navDestLat: '',  // 目的地纬度
+    navDestLng: '',  // 目的地经度
+    navStatusText: ''  // 导航状态文本
   },
 
   onLoad() {
@@ -81,9 +83,17 @@ Page({
     this.syncUserComponents();
     this.startAutoSync();
 
+    // 检查所有导航类组件（包括默认导航助手和社区导航组件）
     const hasNavigationEnabled = this.data.installedComponents.some(
-      (c) => c.id === 'navigation' && c.enabled
+      (c) => {
+        // 检查默认导航助手或category为navigation的社区组件
+        const isNavComponent = c.id === 'navigation' || 
+          (c.config && c.config.category === 'navigation');
+        return isNavComponent && c.enabled;
+      }
     );
+    console.log('[导航面板调试] 导航组件启用状态:', hasNavigationEnabled);
+    console.log('[导航面板调试] 当前已安装组件:', JSON.stringify(this.data.installedComponents));
     this.setData({ navigationAvailable: hasNavigationEnabled });
     if (hasNavigationEnabled) {
       this.startLocationUpdates();
@@ -383,8 +393,16 @@ Page({
   toggleInstalledComponent(e) {
     const index = e.currentTarget.dataset.index;
     const components = this.data.installedComponents;
+    const previousEnabled = components[index].enabled;
     components[index].enabled = !components[index].enabled;
-    const hasNavigationEnabled = components.some(c => c.id === 'navigation' && c.enabled);
+    
+    // 检查所有导航类组件
+    const hasNavigationEnabled = components.some(c => {
+      const isNavComponent = c.id === 'navigation' || 
+        (c.config && c.config.category === 'navigation');
+      return isNavComponent && c.enabled;
+    });
+    
     this.setData({ installedComponents: components, navigationAvailable: hasNavigationEnabled });
     this.saveComponentSettings();
 
@@ -395,11 +413,17 @@ Page({
     });
 
     // 导航助手开关时，控制定位上报
-    if (toggled.id === 'navigation') {
+    const isNavComponent = toggled.id === 'navigation' || 
+      (toggled.config && toggled.config.category === 'navigation');
+    if (isNavComponent) {
       if (toggled.enabled) {
         this.startLocationUpdates();
+        // 启用时推送到服务器
+        this.syncComponentToDevice(toggled, 'install');
       } else {
         this.stopLocationUpdates();
+        // 关闭时通知服务器卸载
+        this.syncComponentToDevice(toggled, 'uninstall');
       }
     }
   },
@@ -554,12 +578,20 @@ Page({
     }
 
     if (action === 'install') {
+      // 准备config，确保featureType存在
+      const config = component.config || {};
+      
+      // 如果config.category为navigation，自动添加featureType
+      if (config.category === 'navigation' && !config.featureType) {
+        config.featureType = 'mobile_navigation';
+      }
+
       // 通过服务器推送组件到ESP32
       GlassesServerAPI.installComponent({
         componentId: component.id,
         name: component.name,
         description: component.description,
-        config: component.config || {},
+        config: config,
         scriptUrl: component.scriptUrl
       })
         .then(res => {
@@ -623,5 +655,140 @@ Page({
         }
       }
     });
+  },
+
+  // ========== 地图导航功能 ==========
+
+  // 搜索输入
+  onNavSearchInput(e) {
+    this.setData({ navSearchKeyword: e.detail.value });
+  },
+
+  // 搜索地点（使用微信地点选择器）
+  searchLocation() {
+    wx.chooseLocation({
+      success: (res) => {
+        console.log('选择的地点:', res);
+        this.setData({
+          navDestName: res.name || res.address,
+          navDestLat: res.latitude,
+          navDestLng: res.longitude,
+          navSearchResults: [],
+          navSearchKeyword: ''
+        });
+        wx.showToast({ title: `已选择: ${res.name || res.address}`, icon: 'success' });
+      },
+      fail: (err) => {
+        console.error('选择地点失败:', err);
+        if (err.errMsg.includes('auth deny')) {
+          wx.showModal({
+            title: '需要授权',
+            content: '请授权使用位置信息',
+            success: (modalRes) => {
+              if (modalRes.confirm) {
+                wx.openSetting();
+              }
+            }
+          });
+        } else if (err.errMsg.includes('cancel')) {
+          // 用户取消，不提示
+        } else {
+          wx.showToast({ title: '选择失败', icon: 'none' });
+        }
+      }
+    });
+  },
+
+  // 选择搜索结果
+  selectSearchResult(e) {
+    const index = e.currentTarget.dataset.index;
+    const selected = this.data.navSearchResults[index];
+    
+    this.setData({
+      navDestName: selected.title,
+      navDestLat: selected.lat,
+      navDestLng: selected.lng,
+      navSearchResults: [],  // 清空搜索结果
+      navSearchKeyword: ''   // 清空搜索框
+    });
+
+    wx.showToast({ title: `已选择: ${selected.title}`, icon: 'success' });
+  },
+
+  // 清除目的地
+  clearDestination() {
+    this.setData({
+      navDestName: '',
+      navDestLat: '',
+      navDestLng: '',
+      navSearchKeyword: '',
+      navSearchResults: []
+    });
+  },
+
+  // 开始地图导航
+  startMapNavigation() {
+    const { navDestName, navDestLat, navDestLng } = this.data;
+
+    if (!navDestName || !navDestLat || !navDestLng) {
+      wx.showToast({ title: '请先搜索并选择目的地', icon: 'none' });
+      return;
+    }
+
+    if (!GlassesServerAPI.isServerConfigured()) {
+      wx.showModal({
+        title: '未配置服务器',
+        content: '请先在“设置”页配置服务器',
+        confirmText: '去配置',
+        success: (res) => {
+          if (res.confirm) {
+            wx.navigateTo({ url: '/pages/server-config/server-config' });
+          }
+        }
+      });
+      return;
+    }
+
+    wx.showLoading({ title: '启动导航...' });
+
+    GlassesServerAPI.startMapNavigation({
+      destination: navDestName,
+      destLat: parseFloat(navDestLat),
+      destLng: parseFloat(navDestLng)
+    })
+      .then(res => {
+        wx.hideLoading();
+        if (res.success) {
+          this.setData({ navStatusText: `导航中: ${navDestName}` });
+          wx.showToast({ title: '导航已启动', icon: 'success' });
+        } else {
+          wx.showToast({ title: res.message || '启动失败', icon: 'none' });
+        }
+      })
+      .catch(err => {
+        wx.hideLoading();
+        wx.showToast({ title: '连接服务器失败', icon: 'none' });
+        console.error('开始导航失败:', err);
+      });
+  },
+
+  // 停止地图导航
+  stopMapNavigation() {
+    if (!GlassesServerAPI.isServerConfigured()) {
+      return;
+    }
+
+    wx.showLoading({ title: '停止中...' });
+
+    GlassesServerAPI.stopMapNavigation()
+      .then(() => {
+        wx.hideLoading();
+        this.setData({ navStatusText: '' });
+        wx.showToast({ title: '已停止导航', icon: 'success' });
+      })
+      .catch(err => {
+        wx.hideLoading();
+        console.error('停止导航失败:', err);
+      });
   }
 });

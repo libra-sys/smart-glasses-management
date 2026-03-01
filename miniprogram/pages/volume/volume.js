@@ -41,12 +41,7 @@ Page({
     this.setData({
       masterVolume: volume
     });
-    
-    // 发送BLE指令到ESP32
-    bluetoothManager.setVolume(volume)
-      .catch(err => {
-        console.log('设备未连接，音量仅保存到本地');
-      });
+    // 移除实时发送，仅在保存时发送
   },
 
   // 媒体音量变化
@@ -55,12 +50,7 @@ Page({
     this.setData({
       mediaVolume: volume
     });
-    
-    // 发送BLE指令
-    bluetoothManager.setVolume(volume)
-      .catch(err => {
-        console.log('设备未连接');
-      });
+    // 移除实时发送
   },
 
   // 通话音量变化

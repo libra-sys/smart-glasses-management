@@ -338,6 +338,15 @@ Page({
       url: '/pages/server-config/server-config'
     });
   },
+  
+  /**
+   * 跳转到模式切换页面
+   */
+  switchMode() {
+    wx.navigateTo({
+      url: '/pages/mode/mode'
+    });
+  },
 
   /**
    * 跳转到AI模型管理页面

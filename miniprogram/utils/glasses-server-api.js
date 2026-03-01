@@ -194,6 +194,45 @@ const GlassesServerAPI = {
     });
   },
 
+  // ==================== 模式切换 ====================
+
+  /**
+   * 切换眼镜运行模式
+   * @param {Object} options
+   * @param {string} options.mode - 模式: 'blind_path' | 'crosswalk' | 'item_search' | 'traffic_light' | 'chat' | 'idle'
+   * @param {string} options.target_item - 寻物模式的目标物品（可选）
+   */
+  switchMode({ mode, target_item }) {
+    return request({
+      url: '/api/miniapp/mode/switch',
+      method: 'POST',
+      data: {
+        mode,
+        target_item
+      }
+    });
+  },
+
+  /**
+   * 获取当前模式
+   */
+  getModeStatus() {
+    return request({
+      url: '/api/miniapp/mode/current',
+      method: 'GET'
+    });
+  },
+
+  /**
+   * 获取所有可用模式
+   */
+  getModeList() {
+    return request({
+      url: '/api/miniapp/mode/list',
+      method: 'GET'
+    });
+  },
+
   // ==================== 物品查找 ====================
 
   /**

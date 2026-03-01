@@ -1,0 +1,61 @@
+<view class="container">
+  <!-- 标题 -->
+  <view class="page-header">
+    <text class="page-title">模式切换</text>
+    <text class="page-subtitle">选择眼镜运行模式</text>
+  </view>
+
+  <!-- 当前模式状态 -->
+  <view class="current-mode-banner">
+    <text class="banner-label">当前模式</text>
+    <text class="banner-mode">{{currentMode}}</text>
+  </view>
+
+  <!-- 模式列表 -->
+  <view class="modes-list">
+    <view 
+      wx:for="{{modes}}" 
+      wx:key="id" 
+      class="mode-card {{currentMode === item.id.toUpperCase() ? 'active' : ''}}"
+      bindtap="switchMode"
+      data-mode="{{item.id}}"
+    >
+      <view class="mode-icon" style="background-color: {{item.color}};">
+        <text class="icon-text">{{item.icon}}</text>
+      </view>
+      
+      <view class="mode-content">
+        <text class="mode-name">{{item.name}}</text>
+        <text class="mode-desc">{{item.description}}</text>
+      </view>
+      
+      <view class="mode-status">
+        <text wx:if="{{currentMode === item.id.toUpperCase()}}" class="status-badge">运行中</text>
+        <text wx:else class="chevron">›</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 寻物输入弹窗 -->
+  <view wx:if="{{showSearchInput}}" class="modal-overlay" bindtap="cancelSearch">
+    <view class="modal-content" catchtap="stopPropagation">
+      <text class="modal-title">寻找物品</text>
+      <text class="modal-desc">请输入要寻找的物品名称</text>
+      
+      <input 
+        class="search-input" 
+        placeholder="例如：手机、钥匙、钱包"
+        value="{{searchItem}}"
+        bindinput="onSearchInput"
+        confirm-type="done"
+        bindconfirm="confirmSearch"
+        focus="{{showSearchInput}}"
+      />
+      
+      <view class="modal-buttons">
+        <button class="modal-btn cancel-btn" bindtap="cancelSearch">取消</button>
+        <button class="modal-btn confirm-btn" bindtap="confirmSearch">确认</button>
+      </view>
+    </view>
+  </view>
+</view>

@@ -4,6 +4,7 @@
     "pages/index/index",
     "pages/device/device",
     "pages/model/model",
+    "pages/mode/mode",
     "pages/aimodel/aimodel",
     "pages/example/index",
     "pages/sync/sync",
@@ -30,7 +31,8 @@
     }
   },
   "requiredPrivateInfos": [
-    "getLocation"
+    "getLocation",
+    "chooseLocation"
   ],
   "tabBar": {
     "color": "#8E8E93",

@@ -86,6 +86,14 @@
       <text class="section-title">快速设置</text>
       
       <view class="action-grid">
+        <view class="action-item" bindtap="switchMode">
+          <view class="action-icon-wrapper mode-bg">
+            <text class="action-icon">🦯</text>
+          </view>
+          <text class="action-name">模式切换</text>
+          <text class="action-desc">盲道/寻物/导航</text>
+        </view>
+
         <view class="action-item" bindtap="serverConfig">
           <view class="action-icon-wrapper server-bg">
             <text class="action-icon">🌐</text>
